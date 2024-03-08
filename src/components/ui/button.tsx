@@ -19,7 +19,9 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         live: 'bg-gradient-to-r from-pink-600 via-pink-700 to-pink-800 hover:from-pink-700 hover:via-pink-800 hover:to-pink-900',
-        'secondary-old': 'bg-secondary-old hover:bg-secondary-old/90',
+        'secondary-old': 'bg-secondary-old hover:bg-secondary-old/80',
+        'primary-old': 'bg-primary-old hover:bg-primary-old/90 text-white border',
+        'input-outline-old': 'border border-input bg-[#15162c] ring-offset-background',
 
       },
       size: {

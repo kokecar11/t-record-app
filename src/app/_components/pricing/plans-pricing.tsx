@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from "react"
-import CardPricing from "../_components/card-pricing"
+import CardPricing from "./card-pricing"
 import {type PlanAdapter } from "~/adapters"
 import { type TypeSubscription } from "@prisma/client"
 import TogglePricing from "./toggle-pricing"

@@ -8,6 +8,8 @@ import {
 import { type Adapter } from "next-auth/adapters";
 import Twitch from "next-auth/providers/twitch";
 
+import { type TypePlan } from "@prisma/client";
+
 import { env } from "~/env";
 import { db } from "~/server/db";
 
@@ -21,6 +23,7 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      plan: TypePlan
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
@@ -50,6 +53,7 @@ export const authOptions: NextAuthOptions = {
         where: { type:'STARTER' },
         select: {
           id: true,
+          type: true,
         },
       })
 
@@ -65,6 +69,14 @@ export const authOptions: NextAuthOptions = {
           status: 'active'
         },
       })
+
+      const subscriptionUser = await db.subscription.findFirst({
+        where: { userId: token.sub },
+        select: {
+          plan: true,
+        }
+      })
+      
       if (twitch){
         if (twitch.expires_at! < Date.now()) {
           const response = await fetch("https://id.twitch.tv/oauth2/token", {
@@ -107,6 +119,7 @@ export const authOptions: NextAuthOptions = {
         user: {
           ...session.user,
           id: token.sub,
+          plan: subscriptionUser?.plan.type ?? 'STARTER',
         },
       }
     }

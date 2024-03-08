@@ -1,10 +1,9 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { signIn, signOut, useSession } from 'next-auth/react'
-
+import { signOut, useSession } from 'next-auth/react'
+import Live from '~/app/_components/live'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-import { Button } from '~/components/ui/button'
 import { 
     DropdownMenu,
     DropdownMenuContent,
@@ -13,9 +12,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger } 
     from '~/components/ui/dropdown-menu'
-import { LogOut, User, Users, Wallet, LayoutDashboard } from 'lucide-react'
+    import { Skeleton } from '../ui/skeleton'
+    import { Badge } from '../ui/badge'
+    import { capitalizeFirstLetter } from '~/lib/utils'
+    import { LogOut, User, Users, Wallet, LayoutDashboard } from 'lucide-react'
+import { Button } from '../ui/button'
 
-export function Navbar () {
+export function NavbarApp () {
     const { data: session } = useSession()
 
     const userImage = session?.user?.image as string | undefined
@@ -33,13 +36,18 @@ export function Navbar () {
             <span className='ml-2 text-primary text-xl font-semibold text-white'>T-Record</span>
         </Link>
         <div className='flex flex-1 font-semibold ml-3'> 
-            <Link className='text-white p-4 font-semibold transition duration-300 ease-in-out hover:bg-purple-600 hover:bg-opacity-10' href='/pricing'>Pricing</Link>
-            <Link className='text-white p-4 font-semibold transition duration-300 ease-in-out hover:bg-purple-600 hover:bg-opacity-10' href='https://trecord.featurebase.app/?b=65aef3148a898e7dd20aae96' target='_blank'>Feedback</Link>
-            <Link className='text-white p-4 font-semibold transition duration-300 ease-in-out hover:bg-purple-600 hover:bg-opacity-10' href='https://trecord.featurebase.app/roadmap' target='_blank'>Roadmap</Link>
-            <Link className='text-white p-4 font-semibold transition duration-300 ease-in-out hover:bg-purple-600 hover:bg-opacity-10' href='https://trecord.featurebase.app/changelog' target='_blank'>Changelog</Link>
-            
+
         </div>
-        <div className='flex justify-end'>
+        <div className='flex items-center space-x-4 flex-none'>
+        {session?.user.plan ? 
+            session?.user.plan === 'PLUS' ? 
+            (<Badge variant='plus'>{capitalizeFirstLetter(session.user.plan.toLowerCase())}</Badge>) : 
+            (<Button variant='secondary' className='capitalize'> update your plan</Button>)
+            :
+            (<Skeleton className="rounded-full h-[22px] w-[66px]"></Skeleton>)
+        }
+        <Live/>
+        <div className=''>
             {session?.user?.image ? (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -75,14 +83,11 @@ export function Navbar () {
                     </DropdownMenuContent>
                 </DropdownMenu>
             ) : (
-                <Button
-                    onClick={async () => {
-                        await signIn('twitch', {callbackUrl: '/dashboard'})
-                    }}>
-                    Get Started
-                </Button>
+                <Skeleton className="w-10 h-10 rounded-full" />
             )}
         </div>
+        </div>
+        
     </nav>
 )
 }

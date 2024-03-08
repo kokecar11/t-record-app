@@ -12,7 +12,7 @@ export type TypeSubscription = 'yearly' | 'monthly';
 export type CardPricingProps = PlanAdapter
 
 export default function CardPricing({ popular, title, link, typeSubscription, price, features, typePlan }: CardPricingProps) {
-    const { data:session } = useSession()
+    const { data: session } = useSession()
     const router = useRouter()
 
     return (
@@ -68,16 +68,15 @@ export default function CardPricing({ popular, title, link, typeSubscription, pr
                         variant={'secondary-old'}
                         id={`${capitalizeFirstLetter(typePlan.toLowerCase())}-${capitalizeFirstLetter(typePlan.toLowerCase())}`} 
                         onClick={async () => {
-                        if(session){
-                            console.log('session', session)
-                            if(typePlan !== 'STARTER'){
-                                router.push('/dashboard')
-                            }else{
-                                router.push(`${link}${session.user.email}`)
+                            if(session){
+                                if(session.user.plan !== 'STARTER'){
+                                    router.push('/dashboard')
+                                }else{
+                                    router.push(`${link}${session.user.email}`)
+                                }
+                            } else {
+                                await signIn('twitch', { callbackUrl: '/pricing' })
                             }
-                        } else {
-                            await signIn('twitch', { callbackUrl: '/pricing' })
-                        }
                         }}
                         >
                         Get started

@@ -1,11 +1,11 @@
 import "~/styles/globals.css";
 
-import { Inter } from "next/font/google";
-
 import { TRPCReactProvider } from "~/trpc/react";
-import { Navbar } from "../components/layout/navbar";
-import { Footer } from "~/components/layout/footer";
+import { Inter } from "next/font/google";
 import { ThemeProvider } from "~/components/theme-provider";
+import { Toaster } from "~/components/ui/toaster";
+import { Navbar } from "~/components/layout/navbar";
+import { Footer } from "~/components/layout/footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,7 +14,7 @@ const inter = Inter({
 
 export const metadata = {
   title: "T-Record",
-  description: "Unlock the power of T-Record's real-time markers for your lives. Organize, customize, and engage like never before. Boost your Twitch presence with T-Record today!",
+  description: "",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
@@ -38,6 +38,7 @@ export default function RootLayout({
             <Footer />
           </ThemeProvider>
         </TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   );

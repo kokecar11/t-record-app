@@ -23,6 +23,7 @@ const config = {
         'live': '#EF233C',
         'twitch': '#6441A4',
         'secondary-old': '#9444fb',
+        'primary-old': '#151623',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

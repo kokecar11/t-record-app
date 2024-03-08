@@ -1,6 +1,4 @@
-// import { getServerAuthSession } from "~/server/auth"
 import { api } from "~/trpc/server"
-import CardPricing from "../_components/card-pricing"
 import { 
   Accordion,
   AccordionContent,
@@ -8,12 +6,10 @@ import {
   AccordionTrigger 
 } from "~/components/ui/accordion"
 
-import TogglePricing from "../_components/toggle-pricing"
-import { useState } from "react"
-import PlansPricing from "../_components/plans-pricing"
+import PlansPricing from "~/app/_components/pricing/plans-pricing"
 
 export default async function Pricing() {
-  // const session = await getServerAuthSession()
+  
   const Faqs = [
     {
       title: 'What are the differences between the starter plan and the T-Record Plus plan?', 
@@ -32,19 +28,16 @@ export default async function Pricing() {
       description: 'Payments for the Plus plan are securely processed through our platform. You can choose your preferred payment option and manage billing details from your account.'
     },
   ]
-  
-  
 
   const plans = await api.plans.getAllPlans.query()
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b to-[#2e026d] from-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-8 px-4 py-14">
+      <div className="container flex flex-col items-center justify-center gap-8 px-4 py-14">
         <h1 className="text-5xl mx-auto md:text-7xl leading-[1.1] max-w-[20ch] text-center text-fluid-base bg-clip-text font-bold">
           Choose your plan and create epic moments live. 
         </h1>
         <h2 className="text-lg text-white text-center animate-fade-down max-w-[50ch] m-auto">
-          
           Stand out with markers, and take your content to the next level.
         </h2>
         <PlansPricing plans={plans} />
@@ -67,3 +60,5 @@ export default async function Pricing() {
     </main>
   );
 }
+
+export const dynamic = 'force-dynamic';

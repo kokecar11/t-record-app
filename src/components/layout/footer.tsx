@@ -5,7 +5,7 @@ import { FeHeart, FeGithub, FeInstagram, FeTwitter } from '../icons'
 export function Footer () {
     return (
     <footer className="bg-[#15162c] text-center text-white border-secondary-old border-t-4">
-        <div className="p-4 flex space-x-6 items-center justify-between container mx-auto px-14">
+        <div className="p-4 flex space-x-6 items-center justify-between container mx-auto sm:px-14">
             <div className="flex justify-center items-center space-x-6">
                 <Link href='/' className={"font-bold text-xl text-white flex place-items-center space-x-2"}>
                     <Image className="rounded-md" src='/images/logo.png' width={40} height={40} alt='Logo T-Record'/>

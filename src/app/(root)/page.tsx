@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { unstable_noStore as noStore } from "next/cache";
 import { authOptions } from "~/server/auth";
-import TryForFreeButton from "./_components/try-for-free";
+import TryForFreeButton from "../_components/try-for-free";
 
 export default async function Home() {
   noStore();
@@ -39,21 +39,24 @@ export default async function Home() {
             Features to help you grow
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-2 px-2 py-4 rounded-lg backdrop-blur-lg">
-            <div className="p-6 rounded-lg col-span-1 sm:col-span-2 shadow-lg bg-white/5 backdrop-filter backdrop-blur-3xl border border-opacity-10 border-white animate-fade-right">
+            <div className="p-6 rounded-lg col-span-1 sm:col-span-2 shadow-lg transition-all bg-white/10 backdrop-filter backdrop-blur-3xl border border-opacity-10 border-white animate-fade-right hover:bg-white/20">
               <h3 className="text-xl font-medium text-white">Link to go to the marker on VOD highlighter.</h3>
               <p className="mt-2 text-sm text-white">T-Record revolutionizes the viewing experience with its standout VOD Highlighter feature. This innovative system allows users to access key moments in their videos through personalized links, streamlining navigation and providing an efficient way to review meaningful content in seconds.</p>
             </div>
-            <div className="p-6 rounded-lg shadow-lg bg-white/5 backdrop-filter backdrop-blur-3xl border border-opacity-10 border-white animate-fade-left">
-                <h3 className="text-xl font-medium text-white">Manage your markers.</h3>
-                <p className="mt-2 text-sm text-white">Effortlessly manage your markers with T-Record&apos;s dashboard. Streamline your experience and organize key points efficiently.</p>
+
+            <div className="p-6 rounded-lg shadow-lg transition-all bg-white/10 backdrop-filter backdrop-blur-3xl border border-opacity-10 border-white animate-fade-left hover:bg-white/20">
+              <h3 className="text-xl font-medium text-white">Manage your markers.</h3>
+              <p className="mt-2 text-sm text-white">Effortlessly manage your markers with T-Record&apos;s dashboard. Streamline your experience and organize key points efficiently.</p>
             </div>
-            <div className="p-6 rounded-lg shadow-lg bg-white/5 backdrop-filter backdrop-blur-3xl border border-opacity-10 border-white animate-fade-right">
-                <h3 className="text-xl font-medium text-white">Notification of marker closing in the chat (coming soon).</h3>
-                <p className="mt-2 text-sm text-white">Reminder notification to close the marker in the chat: Receive instant alerts to ensure you don&apos;t forget to close your markers.</p>
+
+            <div className="p-6 rounded-lg shadow-lg transition-all bg-white/10 backdrop-filter backdrop-blur-3xl border border-opacity-10 border-white animate-fade-right hover:bg-white/20">
+              <h3 className="text-xl font-medium text-white">Notification of marker closing in the chat (coming soon).</h3>
+              <p className="mt-2 text-sm text-white">Reminder notification to close the marker in the chat: Receive instant alerts to ensure you don&apos;t forget to close your markers.</p>
             </div>
-            <div className="p-6 col-span-1 sm:col-span-2 rounded-lg shadow-lg bg-white/5 backdrop-filter backdrop-blur-3xl border border-opacity-10 border-white animate-fade-left">
-                <h3 className="text-xl font-medium text-white">Team manage your markers (coming soon).</h3>
-                <p className="mt-2 text-sm text-white">Your team effortlessly manages your markers with T-Record. Simplify collaboration and streamline your workflow with this intuitive feature.</p>
+
+            <div className="p-6 col-span-1 sm:col-span-2 rounded-lg shadow-lg transition-all bg-white/10 backdrop-filter backdrop-blur-3xl border border-opacity-10 border-white animate-fade-left hover:bg-white/20">
+              <h3 className="text-xl font-medium text-white">Team manage your markers (coming soon).</h3>
+              <p className="mt-2 text-sm text-white">Your team effortlessly manages your markers with T-Record. Simplify collaboration and streamline your workflow with this intuitive feature.</p>
             </div>
           </div>
         </div>

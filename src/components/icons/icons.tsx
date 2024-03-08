@@ -35,3 +35,40 @@ export function FeStar(props: SVGProps<SVGSVGElement>) {
         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><g id="feStar0" fill="none" fillRule="evenodd" stroke="none" stroke-width="1"><g id="feStar1" fill="currentColor" fillRule="nonzero"><path id="feStar2" d="M12.5 17.925L6.629 21l1.121-6.512L3 9.875l6.564-.95L12.5 3l2.936 5.925l6.564.95l-4.75 4.613L18.371 21z"></path></g></g></svg>
     )
 }
+
+export function FeCalendar(props: SVGProps<SVGSVGElement>) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><g id="feCalendar0" fill="none" fillRule="evenodd" stroke="none" stroke-width="1"><g id="feCalendar1" fill="currentColor"><path id="feCalendar2" d="M8 4h8V2h2v2h1a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V2h2v2ZM5 8v12h14V8H5Zm2 3h2v2H7v-2Zm4 0h2v2h-2v-2Zm4 0h2v2h-2v-2Zm0 4h2v2h-2v-2Zm-4 0h2v2h-2v-2Zm-4 0h2v2H7v-2Z"></path></g></g></svg>
+    )
+}
+
+export function FeArrowDown(props: SVGProps<SVGSVGElement>) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><g id="feArrowDown0" fill="none" fillRule="evenodd" stroke="none" stroke-width="1"><g id="feArrowDown1" fill="currentColor"><path id="feArrowDown2" d="m6 7l6 6l6-6l2 2l-8 8l-8-8z"></path></g></g></svg>
+    )
+}
+
+export function FeArrowLeft(props: SVGProps<SVGSVGElement>) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><g id="feArrowLeft0" fill="none" fillRule="evenodd" stroke="none" stroke-width="1"><g id="feArrowLeft1" fill="currentColor"><path id="feArrowLeft2" d="m15 4l2 2l-6 6l6 6l-2 2l-8-8z"></path></g></g></svg>
+    )
+}
+
+
+export function FeArrowRight(props: SVGProps<SVGSVGElement>) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><g id="feArrowRight0" fill="none" fillRule="evenodd" stroke="none" stroke-width="1"><g id="feArrowRight1" fill="currentColor"><path id="feArrowRight2" d="m9.005 4l8 8l-8 8L7 18l6.005-6L7 6z"></path></g></g></svg>
+    )
+}
+
+export function FeArrowUp(props: SVGProps<SVGSVGElement>) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><g id="feArrowUp0" fill="none" fillRule="evenodd" stroke="none" stroke-width="1"><g id="feArrowUp1" fill="currentColor"><path id="feArrowUp2" d="m4 15l8-8l8 8l-2 2l-6-6l-6 6z"></path></g></g></svg>
+    )
+}
+
+export function FeLinkExternal(props: SVGProps<SVGSVGElement>) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><g id="feLinkExternal0" fill="none" fillRule="evenodd" stroke="none" stroke-width="1"><g id="feLinkExternal1" fill="currentColor"><path id="feLinkExternal2" d="M6 8h5v2H6v8h8v-5h2v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Zm10.614-2H12V4h8v8h-2V7.442l-5.336 5.336l-1.414-1.414L16.614 6Z"></path></g></g></svg>
+    )
+}
