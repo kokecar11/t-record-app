@@ -1,12 +1,21 @@
-import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { FeLinkExternal } from "~/components/icons";
-import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
-import { capitalizeFirstLetter } from "~/lib/utils";
-import { type Marker } from "@prisma/client";
-import { type StatusLive } from "~/server/api/routers/live";
+"use client"
 
+import { useState } from "react"
+import Link from "next/link"
+import { useSession } from "next-auth/react"
+import { useQueryClient } from "@tanstack/react-query"
+import { api } from "~/trpc/react"
+
+import { capitalizeFirstLetter, validateMarker } from "~/lib/utils"
+import { FeLinkExternal } from "~/components/icons"
+import { Badge } from "~/components/ui/badge"
+import { Button } from "~/components/ui/button"
+
+import { type Marker } from "@prisma/client"
+import { type StatusLive } from "~/server/api/routers/live"
+import { toast } from "~/components/ui/use-toast"
+
+//TODO:Cambiar la interfaz de Live a un archivo separado
 export interface Live {
     status: StatusLive;
     isLoading?: boolean;
@@ -16,22 +25,40 @@ export interface Live {
 
 export interface MarkerProps {
     marker: Marker,
-    // live: Live,
+    onMarkerUpdate: (marker: Marker) => void
+    live: Live,
 }
 
 
-export default function MarkerCard({marker}:MarkerProps){
-    const {data: session} = useSession()
+export default function MarkerCard({ marker, onMarkerUpdate, live }:MarkerProps){
+    const { data: session } = useSession()
     
+    const [btnMarker, setBtnMarker] = useState({
+        title: "Start record",
+        isInit: true
+    })
+    const mutationUpdateMarker = api.marker.setMarkerInStream.useMutation({
+        onSuccess: async () => {
+            await queryClient.invalidateQueries()
+        },
+    })
+
+    const mutationUpdateMarkerVOD = api.marker.setVODInMarker.useMutation({
+        onSuccess: async () => {
+            await queryClient.invalidateQueries()
+        },
+    })
+
+    const queryClient = useQueryClient();
     const toTimeString = (totalSeconds:number) => {
-        const totalMs = totalSeconds * 1000;
+        const totalMs = totalSeconds * 1000
         return new Date(totalMs).toISOString().slice(11, 19)
     }    
-    
+
     const formatSecondsToTime = (seconds:number) => {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const remainingSeconds = seconds % 60;
+        const hours = Math.floor(seconds / 3600)
+        const minutes = Math.floor((seconds % 3600) / 60)
+        const remainingSeconds = seconds % 60
         return `${hours}h${minutes}m${remainingSeconds}s`
     }
     
@@ -42,14 +69,59 @@ export default function MarkerCard({marker}:MarkerProps){
         }
         return ''
     }
+
+    const handlerRecord = async () => {
+        try {
+            const { updatedMarkerResult, title, message } = await mutationUpdateMarker.mutateAsync({
+                marker: {
+                    id: marker.id,
+                    title: marker.title
+                },
+                isStartMarker: btnMarker.isInit
+            })
+
+            if (updatedMarkerResult) {
+                const { updatedMarkerResultVOD } = await mutationUpdateMarkerVOD.mutateAsync({
+                    marker: {
+                        id: marker.id
+                    },
+                    isStartMarker: btnMarker.isInit
+                })
+            
+                if (updatedMarkerResult.status === 'RECORDING') {
+                    setBtnMarker({ title: "Stop record", isInit: false });
+                }
+
+                showToast(title, message)
+                if(updatedMarkerResultVOD)
+                onMarkerUpdate(updatedMarkerResultVOD)
+            } else {
+                showToast(title, message)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const showToast = (title: string, message:string | undefined) => {
+        toast({
+            title,
+            description: message,
+            variant: "default",
+        })
+    }
+
+    const status: Record<string, 'success' | 'warning' | 'danger'> = {
+        RECORDED: 'success',
+        RECORDING: 'warning',
+        UNRECORDED: 'danger'
+    }
     return (
         <div className={`max-w-2xl bg-primary-old border shadow-lg rounded-lg overflow-hidden`}>
             <div className="p-4 relative">
                 <div className="flex mb-2">
                         <div className="flex-1 space-x-2">
-                            {/* TODO: revisar los badge para que cambien cuando el estado del marcador cambie */}
-                            <Badge variant={'default'}>{capitalizeFirstLetter(marker.status.toLowerCase())}</Badge> 
-                            {/* <Badge variant={'secondary-old'}>{new Date().toLocaleDateString()}</Badge> */}
+                            <Badge variant={status[marker.status]}>{capitalizeFirstLetter(marker.status.toLowerCase())}</Badge> 
                         </div>
                     </div>
                     <h2 className="text-white capitalize font-bold text-lg overflow-hidden text-overflow-ellipsis whitespace-nowrap" title={marker.title}>{marker.title}</h2>
@@ -72,7 +144,15 @@ export default function MarkerCard({marker}:MarkerProps){
                         </div>                            
                     </div>
                     <div className="flex place-content-center">
-                        <Button variant='default' size='sm' className='w-full'>Start record</Button>
+                        <Button 
+                            variant='default' 
+                            size='sm' 
+                            className='w-full' 
+                            onClick={handlerRecord}
+                            disabled={validateMarker(marker.status, live, marker.stream_date, btnMarker.isInit)}
+                        >
+                            {btnMarker.title}
+                        </Button>
                     </div>
             </div>
         </div>

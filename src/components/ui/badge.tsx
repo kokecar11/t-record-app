@@ -17,6 +17,9 @@ const badgeVariants = cva(
         outline: "text-foreground",
         'secondary-old': 'border-secondary-old bg-secondary-old text-white hover:bg-secondary-old/80',
         'plus': 'bg-gradient-to-br from-live/90 via-live/80 to-live/70 text-white',
+        success: 'bg-gradient-to-br from-green-500 via-green-500/80 to-green-500/70 text-white',
+        warning: 'bg-gradient-to-br from-yellow-500 via-yellow-500/80 to-yellow-500/70 text-white',
+        danger: 'bg-gradient-to-br from-red-500 via-red-500/80 to-red-500/70 text-white',
 
       },
     },

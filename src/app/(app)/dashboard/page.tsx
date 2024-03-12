@@ -1,7 +1,7 @@
 import { CreateMarkerForm } from "~/app/_components/markers/create-marker-form"
+import { DatePickerFilter } from "~/app/_components/markers/date-picker-filter"
 import Markerlist from "~/app/_components/markers/markers-list"
-import { DatePickerDemo } from "~/components/ui/date-picker"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "~/components/ui/select"
+import SelectFilter from "~/app/_components/markers/select-filter";
 
 
 export default async function Dashboard() {
@@ -15,22 +15,8 @@ export default async function Dashboard() {
                         <CreateMarkerForm />
                     </div>
                     <div className="flex justify-center items-center space-x-4 mt-4 sm:m-0">
-                        <DatePickerDemo />
-
-                        <Select>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                {/* <SelectLabel>Status</SelectLabel> */}
-                                <SelectItem value="all">All</SelectItem>
-                                <SelectItem value="RECORDING">Recording</SelectItem>
-                                <SelectItem value="UNRECORDED">Unrecorded</SelectItem>
-                                <SelectItem value="RECORDED">Recorded</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+                        <DatePickerFilter />
+                        <SelectFilter />
                     </div>
                 </div>
                 <Markerlist/>

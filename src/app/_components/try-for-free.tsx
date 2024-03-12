@@ -7,6 +7,6 @@ export default function TryForFreeButton() {
     return (
         <Button onClick={async () => {
             await signIn('twitch', {callbackUrl: '/dashboard'})
-        }} variant={'live'} size={'lg'} className="text-base">Try T-Record for free</Button>
+        }} variant={'plus'} size={'lg'} className="text-base">Try T-Record for free</Button>
     )
 }

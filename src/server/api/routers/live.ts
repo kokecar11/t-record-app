@@ -2,6 +2,14 @@ import { env } from "~/env";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 export type StatusLive = 'offline' | 'live';
 
+export interface Live {
+    status: StatusLive;
+    isLoading?: boolean;
+    vod?: string;
+    gameId?: string;
+}
+
+
 export const liveRouter = createTRPCRouter({
 
     getStatusStream: protectedProcedure.query(async ({ctx}) => {
@@ -32,8 +40,8 @@ export const liveRouter = createTRPCRouter({
             const status: StatusLive = 'offline';
             return { status, vod: '', gameId: '' };
         }
-        const live = {
-            status: data[0]?.type,
+        const live: Live = {
+            status: data[0]!.type,
             vod: data[0]?.id,
             gameId: data[0]?.game_id
         }

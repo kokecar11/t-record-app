@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns"
+import { format, startOfToday } from "date-fns"
 import { cn } from "~/lib/utils"
 
 import { Input } from "~/components/ui/input"
@@ -44,12 +44,11 @@ export function CreateMarkerForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      stream_date: new Date(),
+      stream_date: startOfToday(),
     },
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values.stream_date)
     mutate({ title: values.title, stream_date: values.stream_date})
     toast({
       title: "Marker created",

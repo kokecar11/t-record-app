@@ -50,11 +50,13 @@ export function Navbar () {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56">
                         <DropdownMenuGroup>
-                            <DropdownMenuItem className='cursor-pointer'>
-                                <LayoutDashboard className="mr-2 h-4 w-4" />
-                                <span>Dashboard</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className='cursor-pointer'>
+                            <Link href='/dashboard/'>
+                                <DropdownMenuItem className='cursor-pointer'>
+                                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                                        <span>Dashboard</span>
+                                </DropdownMenuItem>
+                            </Link>
+                            {/* <DropdownMenuItem className='cursor-pointer'>
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Profile</span>
                             </DropdownMenuItem>
@@ -65,7 +67,7 @@ export function Navbar () {
                             <DropdownMenuItem>
                                 <Users className="mr-2 h-4 w-4" />
                                 <span>Team</span>
-                            </DropdownMenuItem>
+                            </DropdownMenuItem> */}
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={async () => {await signOut()}} className='cursor-pointer'>
