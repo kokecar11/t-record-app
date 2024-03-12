@@ -17,12 +17,15 @@ import {
     import { capitalizeFirstLetter } from '~/lib/utils'
     import { LogOut, LayoutDashboard } from 'lucide-react'
 import { Button } from '../ui/button'
+import { useRouter } from 'next/navigation'
 
 export function NavbarApp () {
     const { data: session } = useSession()
+    const router = useRouter()
 
     const userImage = session?.user?.image as string | undefined
     const initalName = session?.user?.name?.split(" ").map((n: string) => n[0]).join("")
+    const handlerNav = () => router.push('/billing/', { scroll: false })
 
     return (
     <nav className='w-full sticky container flex z-10 px-4 sm:px-14 py-1.5 items-center justify-between top-0 bg-transparent backdrop-filter backdrop-blur-lg'>
@@ -42,7 +45,7 @@ export function NavbarApp () {
         {session?.user.plan ? 
             session?.user.plan === 'PLUS' ? 
             (<Badge variant='plus'>{capitalizeFirstLetter(session.user.plan.toLowerCase())}</Badge>) : 
-            (<Button variant='secondary' className='capitalize'> update your plan</Button>)
+            (<Button variant='secondary' className='capitalize' onClick={handlerNav}> update your plan</Button>)
             :
             (<Skeleton className="rounded-full h-[22px] w-[66px]"></Skeleton>)
         }

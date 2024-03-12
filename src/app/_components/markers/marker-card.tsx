@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
 import { useQueryClient } from "@tanstack/react-query"
@@ -11,17 +11,10 @@ import { FeLinkExternal } from "~/components/icons"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 
-import { type Marker } from "@prisma/client"
-import { type StatusLive } from "~/server/api/routers/live"
+import type { Marker } from "@prisma/client"
+import type { Live } from "~/models"
 import { toast } from "~/components/ui/use-toast"
 
-//TODO:Cambiar la interfaz de Live a un archivo separado
-export interface Live {
-    status: StatusLive;
-    isLoading?: boolean;
-    vod?: string;
-    gameId?: string;
-}
 
 export interface MarkerProps {
     marker: Marker,
@@ -32,11 +25,17 @@ export interface MarkerProps {
 
 export default function MarkerCard({ marker, onMarkerUpdate, live }:MarkerProps){
     const { data: session } = useSession()
+    const queryClient = useQueryClient()
     
-    const [btnMarker, setBtnMarker] = useState({
-        title: "Start record",
-        isInit: true
+    const [btnMarker] = useState<{title:string; isInit:boolean}>(() => {
+        const savedState = localStorage.getItem('btnMarker-' + marker.id);
+        if (savedState) {
+            return JSON.parse(savedState) as { title: string; isInit: boolean };
+        } else {
+            return { title: "Start record", isInit: true }
+        }
     })
+
     const mutationUpdateMarker = api.marker.setMarkerInStream.useMutation({
         onSuccess: async () => {
             await queryClient.invalidateQueries()
@@ -49,7 +48,6 @@ export default function MarkerCard({ marker, onMarkerUpdate, live }:MarkerProps)
         },
     })
 
-    const queryClient = useQueryClient();
     const toTimeString = (totalSeconds:number) => {
         const totalMs = totalSeconds * 1000
         return new Date(totalMs).toISOString().slice(11, 19)
@@ -71,6 +69,7 @@ export default function MarkerCard({ marker, onMarkerUpdate, live }:MarkerProps)
     }
 
     const handlerRecord = async () => {
+
         try {
             const { updatedMarkerResult, title, message } = await mutationUpdateMarker.mutateAsync({
                 marker: {
@@ -89,7 +88,10 @@ export default function MarkerCard({ marker, onMarkerUpdate, live }:MarkerProps)
                 })
             
                 if (updatedMarkerResult.status === 'RECORDING') {
-                    setBtnMarker({ title: "Stop record", isInit: false });
+                    localStorage.setItem(
+                        'btnMarker-' + marker.id, 
+                        JSON.stringify({ title: "Stop record", isInit: false })
+                    )
                 }
 
                 showToast(title, message)
@@ -111,11 +113,18 @@ export default function MarkerCard({ marker, onMarkerUpdate, live }:MarkerProps)
         })
     }
 
+    useEffect(() => {
+        if(marker.status === 'RECORDED'){
+            localStorage.removeItem('btnMarker-' + marker.id)
+        }
+    }, [marker.id, marker.status])
+
     const status: Record<string, 'success' | 'warning' | 'danger'> = {
         RECORDED: 'success',
         RECORDING: 'warning',
         UNRECORDED: 'danger'
     }
+
     return (
         <div className={`max-w-2xl bg-primary-old border shadow-lg rounded-lg overflow-hidden`}>
             <div className="p-4 relative">
