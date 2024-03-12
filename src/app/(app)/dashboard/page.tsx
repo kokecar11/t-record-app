@@ -2,7 +2,13 @@ import { CreateMarkerForm } from "~/app/_components/markers/create-marker-form"
 import { DatePickerFilter } from "~/app/_components/markers/date-picker-filter"
 import Markerlist from "~/app/_components/markers/markers-list"
 import SelectFilter from "~/app/_components/markers/select-filter";
+import type { Metadata } from 'next'
 
+
+export const metadata: Metadata = {
+    title: 'T-Record | Dashboard',
+    description: 'T-Record Dashboard',
+}
 
 export default async function Dashboard() {
 

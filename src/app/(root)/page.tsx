@@ -2,6 +2,12 @@ import { getServerSession } from "next-auth";
 import { unstable_noStore as noStore } from "next/cache";
 import { authOptions } from "~/server/auth";
 import TryForFreeButton from "../_components/try-for-free";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'T-Record',
+  description: "Unlock the power of T-Record's real-time markers for your lives. Organize, customize, and engage like never before. Boost your Twitch presence with T-Record today!",
+}
 
 export default async function Home() {
   noStore();

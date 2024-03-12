@@ -13,7 +13,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger } 
     from '~/components/ui/dropdown-menu'
-import { LogOut, User, Users, Wallet, LayoutDashboard } from 'lucide-react'
+import { LogOut, LayoutDashboard } from 'lucide-react'
 
 export function Navbar () {
     const { data: session } = useSession()

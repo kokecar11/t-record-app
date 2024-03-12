@@ -15,7 +15,7 @@ import {
     import { Skeleton } from '../ui/skeleton'
     import { Badge } from '../ui/badge'
     import { capitalizeFirstLetter } from '~/lib/utils'
-    import { LogOut, User, Users, Wallet, LayoutDashboard } from 'lucide-react'
+    import { LogOut, LayoutDashboard } from 'lucide-react'
 import { Button } from '../ui/button'
 
 export function NavbarApp () {

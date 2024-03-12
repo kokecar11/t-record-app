@@ -7,6 +7,12 @@ import {
 } from "~/components/ui/accordion"
 
 import PlansPricing from "~/app/_components/pricing/plans-pricing"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: 'T-Record | Pricing',
+  description: 'T-Record Pricing',
+}
 
 export default async function Pricing() {
   
