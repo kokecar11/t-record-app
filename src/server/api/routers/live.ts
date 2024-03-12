@@ -1,13 +1,6 @@
 import { env } from "~/env";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-export type StatusLive = 'offline' | 'live';
-
-export interface Live {
-    status: StatusLive;
-    isLoading?: boolean;
-    vod?: string;
-    gameId?: string;
-}
+import type { Live, StatusLive } from "~/models";
 
 
 export const liveRouter = createTRPCRouter({

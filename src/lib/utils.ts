@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { isSameDay } from "date-fns";
 import { twMerge } from "tailwind-merge"
-import { type Live } from "~/app/_components/markers/marker-card";
+import type {  Live } from "~/models";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
