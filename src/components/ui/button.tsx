@@ -23,6 +23,7 @@ const buttonVariants = cva(
         'secondary-old': 'bg-secondary-old hover:bg-secondary-old/80',
         'primary-old': 'bg-primary-old hover:bg-primary-old/90 text-white border',
         'input-outline-old': 'border border-input bg-[#15162c] ring-offset-background',
+        danger: 'bg-red-600 hover:bg-red-600/80 text-white',
 
       },
       size: {
