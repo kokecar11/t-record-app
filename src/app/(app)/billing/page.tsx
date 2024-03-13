@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import BtnCancelSubscription from '~/app/_components/billing/btn-cancel-sub'
 import { Button } from '~/components/ui/button'
 import {
 	Table,
@@ -35,13 +36,12 @@ export default async function Billing() {
 						</div>
 						<div className="flex-none">
 							{session?.user.plan === 'STARTER' ? (
-								<Button variant={'default'} className="">
-									Upgrade Plan
-								</Button>
+								// <Button variant={'default'} className="">
+								// 	Upgrade Plan
+								// </Button>
+								<BtnCancelSubscription />
 							) : (
-								<Button variant={'secondary'} className="">
-									Cancel Plan
-								</Button>
+								<BtnCancelSubscription />
 							)}
 						</div>
 					</div>

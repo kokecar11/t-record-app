@@ -1,6 +1,10 @@
 import { z } from 'zod'
 import { plansAdapter } from '~/adapters'
-import { createTRPCRouter, publicProcedure } from '~/server/api/trpc'
+import {
+	createTRPCRouter,
+	protectedProcedure,
+	publicProcedure,
+} from '~/server/api/trpc'
 
 export const plansRouter = createTRPCRouter({
 	getPlanByType: publicProcedure
@@ -24,4 +28,18 @@ export const plansRouter = createTRPCRouter({
 		})
 		return plansAdapter(allPlans)
 	}),
+
+	getPlanByProductId: publicProcedure
+		.input(z.object({ productId: z.string().min(1) }))
+		.query(async ({ ctx, input }) => {
+			
+			return await ctx.db.plan.findFirst({
+				where: {
+					product_id: input.productId,
+				},
+				select: {
+					id: true,
+				},
+			})
+		}),
 })
