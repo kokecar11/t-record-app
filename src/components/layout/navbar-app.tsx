@@ -1,8 +1,10 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import Live from '~/app/_components/live'
+import { capitalizeFirstLetter } from '~/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { 
     DropdownMenu,
@@ -12,12 +14,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger } 
     from '~/components/ui/dropdown-menu'
-    import { Skeleton } from '../ui/skeleton'
-    import { Badge } from '../ui/badge'
-    import { capitalizeFirstLetter } from '~/lib/utils'
-    import { LogOut, LayoutDashboard } from 'lucide-react'
+import { Skeleton } from '../ui/skeleton'
+import { Badge } from '../ui/badge'
+import { LogOut, LayoutDashboard, Wallet, Users } from 'lucide-react'
 import { Button } from '../ui/button'
-import { useRouter } from 'next/navigation'
+
 
 export function NavbarApp () {
     const { data: session } = useSession()
@@ -67,18 +68,18 @@ export function NavbarApp () {
                                     <span>Dashboard</span>    
                                 </DropdownMenuItem>
                             </Link>
-                            {/* <DropdownMenuItem className='cursor-pointer'>
-                                <User className="mr-2 h-4 w-4" />
-                                <span>Profile</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className='cursor-pointer'>
-                                <Wallet className="mr-2 h-4 w-4" />
-                                <span>Billing</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Users className="mr-2 h-4 w-4" />
-                                <span>Team</span>
-                            </DropdownMenuItem> */}
+                            <Link href='/billing'>
+                                <DropdownMenuItem className='cursor-pointer'>
+                                    <Wallet className="mr-2 h-4 w-4" />
+                                    <span>Billing</span>
+                                </DropdownMenuItem>
+                            </Link>
+                            <Link href='/team'>
+                                <DropdownMenuItem className='cursor-pointer'>
+                                    <Users className="mr-2 h-4 w-4" />
+                                    <span>Team</span>
+                                </DropdownMenuItem>
+                            </Link>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={async () => {await signOut()}} className='cursor-pointer'>

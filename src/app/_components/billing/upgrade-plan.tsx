@@ -46,7 +46,7 @@ const formSchema = z.object({
 	}),
 })
 
-export function CreateMarkerForm() {
+export function UpgradePlan() {
 	const { toast } = useToast()
 	const [open, setOpen] = useState(false)
 	const queryClient = useQueryClient()
