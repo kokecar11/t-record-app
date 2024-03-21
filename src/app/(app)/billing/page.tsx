@@ -1,45 +1,39 @@
 import type { Metadata } from 'next'
+import { format } from 'date-fns'
+import { api } from '~/trpc/server'
+import { getServerAuthSession } from '~/server/auth'
+
 import BtnCancelSubscription from '~/app/_components/billing/btn-cancel-sub'
 import { Button } from '~/components/ui/button'
-import {
-	Table,
-	TableBody,
-	TableCaption,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from '~/components/ui/table'
-
-import { getServerAuthSession } from '~/server/auth'
-import { api } from '~/trpc/server'
+import { DataTable } from '~/app/_components/billing/data-table'
+import { columns } from '~/app/_components/billing/columns'
+import { BtnUpgradeSub } from '~/app/_components/billing/btn-upgrade-sub'
 
 export const metadata: Metadata = {
 	title: 'T-Record | Plan & Billing',
-	description: 'T-Record Dashboard',
+	description:
+		'Descubre los detalles de nuestros planes, gratuito y de pago, con información sobre fechas de caducidad y renovación, así como precios. ¡Encuentra el plan perfecto para ti!',
 }
 
 export default async function Billing() {
 	const session = await getServerAuthSession()
 	const subscription = await api.subscriptions.getSubscriptionByUserId.mutate()
-
+	const billingHistory =
+		await api.subscriptions.billingHistoryLemonSqueezy.mutate()
 	return (
 		<main className="container flex min-h-screen flex-col bg-background text-white">
 			<div className="container">
-				<div className="my-2 rounded-lg border-2 border-primary bg-primary/30 shadow-lg">
-					<div className="mx-4 flex border-b border-white/50 pt-4">
+				<div className="my-2 rounded-lg bg-primary/30 p-2 shadow-lg">
+					<div className="mx-4 flex items-center border-b border-white/50 pt-4">
 						<div className="flex-1">
-							<h1 className="text-xl font-bold">Plan Information</h1>
-							<h2 className="mb-1 text-sm text-gray-400">
+							<span className="text-xl font-bold">Plan Information</span>
+							<h2 className="mb-1 text-sm text-gray-200">
 								Plan information description
 							</h2>
 						</div>
 						<div className="flex-none">
 							{session?.user.plan === 'STARTER' ? (
-								// <Button variant={'default'} className="">
-								// 	Upgrade Plan
-								// </Button>
-								<BtnCancelSubscription />
+								<BtnUpgradeSub />
 							) : (
 								<BtnCancelSubscription />
 							)}
@@ -53,12 +47,14 @@ export default async function Billing() {
 								{session?.user.plan.toLowerCase()}
 							</span>
 						</div>
-						<div className="grid sm:flex-1">
-							<span className="text-sm text-gray-400">Payment</span>
+						<div className="grid text-sm font-semibold capitalize sm:flex-1">
+							<span className="text-sm font-normal text-gray-400">Payment</span>
 							{session?.user.plan === 'STARTER' ? (
-								<span className="text-lg capitalize text-white">FREE</span>
-							) : subscription?.type === 'monthly' ? (
 								<span className="text-sm font-semibold capitalize text-white">
+									FREE
+								</span>
+							) : subscription?.type === 'monthly' ? (
+								<span>
 									${subscription?.plan.price_monthly}
 									<span className="text-xs lowercase text-gray-100">
 										{' '}
@@ -66,7 +62,7 @@ export default async function Billing() {
 									</span>
 								</span>
 							) : (
-								<span className="text-sm font-semibold capitalize text-white">
+								<span>
 									${subscription?.plan.price_yearly}
 									<span className="text-xs lowercase text-gray-100">
 										{' '}
@@ -79,7 +75,7 @@ export default async function Billing() {
 							<div className="grid sm:flex-1">
 								<span className="text-sm text-gray-400">Renews at</span>
 								<span className="text-sm font-semibold text-white">
-									{subscription.renews_at.toDateString()}
+									{format(new Date(subscription.renews_at), 'd LLL, yyyy')}
 								</span>
 							</div>
 						)}
@@ -87,40 +83,21 @@ export default async function Billing() {
 							<div className="grid sm:flex-1">
 								<span className="text-sm text-gray-400">Ends at</span>
 								<span className="text-sm font-semibold text-white">
-									{subscription.ends_at.toDateString()}
+									{format(new Date(subscription.ends_at), 'd LLL, yyyy')}
 								</span>
 							</div>
 						)}
 					</div>
 				</div>
-				{/* TODO:Verificar Billing information con LS */}
-				<div className="my-4 rounded-lg border-2 bg-primary-old">
+				<div className="my-4 rounded-lg bg-[#15162c] p-2 shadow-lg">
 					<div className="mx-4 border-b border-white/50 pt-4">
-						<h1 className="text-xl font-bold">Billing Information</h1>
-						<h2 className="mb-1 text-sm text-gray-400">
-							Billing information description
+						<span className="text-xl font-bold">Billing History</span>
+						<h2 className="mb-1 text-sm text-gray-200">
+							Billing information history
 						</h2>
 					</div>
 					<div className="p-4">
-						<Table>
-							<TableCaption>A list of your recent invoices.</TableCaption>
-							<TableHeader>
-								<TableRow>
-									<TableHead className="w-[100px]">Invoice</TableHead>
-									<TableHead>Status</TableHead>
-									<TableHead>Method</TableHead>
-									<TableHead className="text-right">Amount</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								<TableRow>
-									<TableCell className="font-medium">INV001</TableCell>
-									<TableCell>Paid</TableCell>
-									<TableCell>Credit Card</TableCell>
-									<TableCell className="text-right">$250.00</TableCell>
-								</TableRow>
-							</TableBody>
-						</Table>
+						<DataTable columns={columns} data={billingHistory} />
 					</div>
 				</div>
 			</div>

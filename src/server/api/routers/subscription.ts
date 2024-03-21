@@ -1,4 +1,5 @@
 import { type TypeSubscription } from '@prisma/client'
+import { cancelSubscription, lemonSqueezySetup, listSubscriptionInvoices } from '@lemonsqueezy/lemonsqueezy.js';
 import { z } from 'zod'
 import { env } from '~/env'
 
@@ -7,6 +8,7 @@ import {
 	protectedProcedure,
 	publicProcedure,
 } from '~/server/api/trpc'
+import { billingsHistoryAdapter } from '~/adapters/subscription.adapter';
 
 export const subscriptionsRouter = createTRPCRouter({
 	createInitialSub: protectedProcedure
@@ -88,9 +90,9 @@ export const subscriptionsRouter = createTRPCRouter({
 			return sub
 		}),
 
-	cancelSubscription: protectedProcedure.mutation(async ({ ctx }) => {
-		const urlApiLemonSqueezy = 'https://api.lemonsqueezy.com/v1/subscriptions/'
-		const lsSubscriptionId = await ctx.db.subscription.findFirst({
+	cancelSubscriptionLemonSqueezy: protectedProcedure.mutation(async ({ ctx }) => {
+		lemonSqueezySetup({apiKey: env.LS_API_KEY})
+		const subscriptionId = await ctx.db.subscription.findFirst({
 			where: {
 				userId: ctx.session.user.id,
 			},
@@ -98,22 +100,9 @@ export const subscriptionsRouter = createTRPCRouter({
 				ls_subsId: true,
 			},
 		})
-		if(!lsSubscriptionId?.ls_subsId) {
+		if (!subscriptionId?.ls_subsId) {
 			return { message: 'Subscription not found' }
 		}
-		const headers = {
-			Accept: 'application/vnd.api+json',
-			'Content-Type': 'application/vnd.api+json',
-			Authorization: 'Bearer ' + env.LS_API_KEY,
-		}
-		const respCancelSubscription = await fetch(
-			`${urlApiLemonSqueezy}${lsSubscriptionId?.ls_subsId}`,
-			{
-				method: 'DELETE',
-				headers,
-			},
-		)
-		const respCancelSubscriptionJson = await respCancelSubscription.json() as {data: {attributes: {cancelled: boolean, renews_at: string, ends_at: string}}}
 		const planStarter = await ctx.db.plan.findFirst({
 			where: {
 				type: 'STARTER',
@@ -122,19 +111,19 @@ export const subscriptionsRouter = createTRPCRouter({
 				id: true,
 			},
 		})
-		console.log(respCancelSubscriptionJson)
-		if (respCancelSubscriptionJson.data.attributes.cancelled) {
+		const { statusCode, data } = await cancelSubscription(subscriptionId.ls_subsId)
+		if (statusCode === 200 && data?.data.attributes.cancelled) {
 			await ctx.db.subscription.update({
 				where: {
 					userId: ctx.session.user.id,
 				},
 				data: {
+					ls_subsId: null,
 					planId: planStarter?.id,
-					renews_at: respCancelSubscriptionJson.data.attributes.renews_at,
-					ends_at: respCancelSubscriptionJson.data.attributes.ends_at,
+					renews_at: data.data.attributes.renews_at,
+					ends_at: data.data.attributes.ends_at,
 					variant_id: null,
 					type: 'monthly',
-					ls_subsId: null,
 				},
 			})
 			return {
@@ -146,4 +135,34 @@ export const subscriptionsRouter = createTRPCRouter({
 			message: 'Subscription could not be cancelled',
 		}
 	}),
+
+	billingHistoryLemonSqueezy: protectedProcedure.mutation(async ({ ctx }) => {
+		lemonSqueezySetup({apiKey: env.LS_API_KEY})
+		const subscriptionId = await ctx.db.subscription.findFirst({
+			where: {
+				userId: ctx.session.user.id,
+			},
+			select: {
+				ls_subsId: true,
+			},
+		})
+		if (!subscriptionId?.ls_subsId) {
+			return []
+		}
+		const { data } = await listSubscriptionInvoices({ 
+			filter: { 
+				storeId: 37079, 
+				subscriptionId:subscriptionId.ls_subsId
+			}, 
+			// page: { 
+			// 	number: 1, 
+			// 	size: 10 
+			// }
+		});
+		if (!data) {
+			return []
+		}
+		
+		return billingsHistoryAdapter(data)
+	})
 })

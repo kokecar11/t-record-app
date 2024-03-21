@@ -7,14 +7,14 @@ import { api } from '~/trpc/react'
 
 export default function BtnCancelSubscription() {
 	const queryClient = useQueryClient()
-	const { mutate, data } = api.subscriptions.cancelSubscription.useMutation({
-		onSuccess: async () => {
-			await queryClient.invalidateQueries()
-		},
-	})
+	const { mutate, data } =
+		api.subscriptions.cancelSubscriptionLemonSqueezy.useMutation({
+			onSuccess: async () => {
+				await queryClient.invalidateQueries()
+			},
+		})
 	const handlerCancelSubscription = async () => {
 		mutate()
-		console.log(data)
 		toast({
 			title: 'Subscription Canceled',
 			description: data?.message,

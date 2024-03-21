@@ -2,7 +2,7 @@
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { type PlanAdapter } from '~/adapters'
-import { FeCheckCircle, FeStar } from '~/components/icons'
+import { FeCheckCircle, FeGift, FeStar } from '~/components/icons'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { capitalizeFirstLetter } from '~/lib/utils'
@@ -35,7 +35,14 @@ export default function CardPricing({
 
 			<div
 				className={`flex flex-col rounded-lg  bg-[#15162c] p-4 ${!popular && 'h-full'}`}>
-				<span className="mb-4 text-xl font-medium text-white">{title} </span>
+				<span className="mb-4 flex text-xl font-medium text-white">
+					{title}{' '}
+					{typeSubscription === 'yearly' && popular && (
+						<Badge className="ml-2" variant="secondary-old">
+							<FeGift className="mr-1 text-lg" />2 months free
+						</Badge>
+					)}{' '}
+				</span>
 				<hr className="mb-8 border-white opacity-10"></hr>
 				<div className="flex items-baseline text-white">
 					<span className="text-5xl font-extrabold tracking-tight">
@@ -43,11 +50,6 @@ export default function CardPricing({
 					</span>
 					<span className="ml-1 text-gray-200">
 						/ {capitalizeFirstLetter(typeSubscription.toLowerCase())}
-						{typeSubscription === 'yearly' && popular && (
-							<Badge className="ml-2" variant="secondary-old">
-								2 months FREE
-							</Badge>
-						)}
 					</span>
 				</div>
 				<hr className="mt-8 border-white opacity-10"></hr>
