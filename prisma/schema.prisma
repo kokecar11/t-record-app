@@ -84,6 +84,7 @@ model Subscription {
     id                 String  @id @default(cuid())
     userId             String  @unique
     planId             String
+    store_id           String?
     ls_subsId          String?
     variant_id         String?
     created_at         DateTime  @default(now())

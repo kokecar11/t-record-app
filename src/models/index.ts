@@ -1,1 +1,1 @@
-export * from "./live";
+export * from './live'

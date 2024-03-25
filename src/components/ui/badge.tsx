@@ -1,42 +1,45 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from 'react'
+import { cva, type VariantProps } from 'class-variance-authority'
 
-import { cn } from "~/lib/utils"
+import { cn } from '~/lib/utils'
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-        'secondary-old': 'border-secondary-old bg-secondary-old text-white hover:bg-secondary-old/80',
-        'plus': 'bg-gradient-to-br from-live/90 via-live/80 to-live/70 text-white',
-        success: 'bg-gradient-to-br from-green-500 via-green-500/80 to-green-500/70 text-white',
-        warning: 'bg-gradient-to-br from-yellow-500 via-yellow-500/80 to-yellow-500/70 text-white',
-        danger: 'bg-gradient-to-br from-red-500 via-red-500/80 to-red-500/70 text-white',
-
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
+	'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+	{
+		variants: {
+			variant: {
+				default:
+					'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
+				secondary:
+					'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
+				destructive:
+					'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
+				outline: 'text-foreground',
+				'secondary-old':
+					'border-secondary-old bg-secondary-old text-white hover:bg-secondary-old/80',
+				plus: 'bg-gradient-to-br from-live/90 via-live/80 to-live/70 text-white',
+				success:
+					'bg-gradient-to-br from-green-500 via-green-500/80 to-green-500/70 text-white',
+				warning:
+					'bg-gradient-to-br from-yellow-500 via-yellow-500/80 to-yellow-500/70 text-white',
+				danger:
+					'bg-gradient-to-br from-red-500 via-red-500/80 to-red-500/70 text-white',
+			},
+		},
+		defaultVariants: {
+			variant: 'default',
+		},
+	},
 )
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+	extends React.HTMLAttributes<HTMLDivElement>,
+		VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
-  )
+	return (
+		<div className={cn(badgeVariants({ variant }), className)} {...props} />
+	)
 }
 
 export { Badge, badgeVariants }
