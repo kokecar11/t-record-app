@@ -1,10 +1,6 @@
 import { z } from 'zod'
 import { plansAdapter } from '~/adapters'
-import {
-	createTRPCRouter,
-	protectedProcedure,
-	publicProcedure,
-} from '~/server/api/trpc'
+import { createTRPCRouter, publicProcedure } from '~/server/api/trpc'
 
 export const plansRouter = createTRPCRouter({
 	getPlanByType: publicProcedure

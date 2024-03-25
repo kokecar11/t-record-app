@@ -3,7 +3,7 @@ import { type ListSubscriptionInvoices } from "@lemonsqueezy/lemonsqueezy.js"
 export type Billing = {
 	id: string
 	amount: string
-	status: 'paid' | 'pending' | 'void' | 'refunded'
+	status: string
 	status_formatted: string
 	billingReason: string
 	date: string
@@ -21,7 +21,6 @@ export const billingsHistoryAdapter = (billings: ListSubscriptionInvoices) => {
         date: b.attributes.created_at,
         currency: b.attributes.currency,
     }))
-    
     return listInvoices
 }
 

@@ -1,4 +1,4 @@
-import { type TypeSubscription } from '@prisma/client'
+import { type StatusSubscription, type TypeSubscription } from '@prisma/client'
 import { cancelSubscription, lemonSqueezySetup, listSubscriptionInvoices } from '@lemonsqueezy/lemonsqueezy.js';
 import { z } from 'zod'
 import { env } from '~/env'
@@ -46,7 +46,7 @@ export const subscriptionsRouter = createTRPCRouter({
 		})
 	}),
 
-	setPaymentSubscriptionByUser: publicProcedure
+	setSubscriptionPlus: publicProcedure
 		.input(
 			z.object({
 				product_id: z.string().min(1),
@@ -54,8 +54,10 @@ export const subscriptionsRouter = createTRPCRouter({
 				variant_id: z.string().min(1),
 				variant_name: z.string().min(1),
 				renews_at: z.string().min(1),
-				ends_at: z.string().min(1),
+				ends_at: z.string().optional().nullable(),
 				ls_subsId: z.string().min(1),
+				status: z.string().min(1),
+				store_id: z.string().min(1),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -84,13 +86,14 @@ export const subscriptionsRouter = createTRPCRouter({
 					type: input.variant_name as TypeSubscription,
 					ls_subsId: input.ls_subsId,
 					planId: plan?.id,
+					status: input.status as StatusSubscription,
+					store_id: input.store_id,
 				},
 			})
-
 			return sub
 		}),
 
-	cancelSubscriptionLemonSqueezy: protectedProcedure.mutation(async ({ ctx }) => {
+	cancelSubscriptionLemonSqueezyAPI: protectedProcedure.mutation(async ({ ctx }) => {
 		lemonSqueezySetup({apiKey: env.LS_API_KEY})
 		const subscriptionId = await ctx.db.subscription.findFirst({
 			where: {
@@ -100,32 +103,13 @@ export const subscriptionsRouter = createTRPCRouter({
 				ls_subsId: true,
 			},
 		})
+
 		if (!subscriptionId?.ls_subsId) {
 			return { message: 'Subscription not found' }
 		}
-		const planStarter = await ctx.db.plan.findFirst({
-			where: {
-				type: 'STARTER',
-			},
-			select: {
-				id: true,
-			},
-		})
+
 		const { statusCode, data } = await cancelSubscription(subscriptionId.ls_subsId)
 		if (statusCode === 200 && data?.data.attributes.cancelled) {
-			await ctx.db.subscription.update({
-				where: {
-					userId: ctx.session.user.id,
-				},
-				data: {
-					ls_subsId: null,
-					planId: planStarter?.id,
-					renews_at: data.data.attributes.renews_at,
-					ends_at: data.data.attributes.ends_at,
-					variant_id: null,
-					type: 'monthly',
-				},
-			})
 			return {
 				message:
 					'Subscription cancelled, you will be able to enjoy the service until the end of the current billing period.',
@@ -136,6 +120,37 @@ export const subscriptionsRouter = createTRPCRouter({
 		}
 	}),
 
+	cancelAndExpiredSubscription: publicProcedure
+		.input(
+			z.object({
+				renews_at: z.string().min(1),
+				ends_at: z.string().optional().nullable(),
+				status: z.string().min(1),
+				ls_subsId: z.string().min(1),
+				user_email: z.string().min(1),
+			})
+		)
+		.mutation(async ({ ctx, input }) => {
+			const user = await ctx.db.user.findFirst({
+				where: { email: input.user_email },
+				select: {
+					id: true,
+				},
+			})
+			
+			await ctx.db.subscription.update({
+				where: {
+					userId: user?.id,
+				},
+				data: {
+					renews_at: input.renews_at,
+					ends_at: input.ends_at,
+					status: input.status as StatusSubscription,
+					type: 'monthly',
+				},
+			})				
+		}),
+
 	billingHistoryLemonSqueezy: protectedProcedure.mutation(async ({ ctx }) => {
 		lemonSqueezySetup({apiKey: env.LS_API_KEY})
 		const subscriptionId = await ctx.db.subscription.findFirst({
@@ -144,20 +159,18 @@ export const subscriptionsRouter = createTRPCRouter({
 			},
 			select: {
 				ls_subsId: true,
+				store_id: true,
 			},
 		})
-		if (!subscriptionId?.ls_subsId) {
+		if (!subscriptionId?.ls_subsId || !subscriptionId?.store_id) {
 			return []
 		}
+
 		const { data } = await listSubscriptionInvoices({ 
 			filter: { 
-				storeId: 37079, 
+				storeId: subscriptionId.store_id, 
 				subscriptionId:subscriptionId.ls_subsId
-			}, 
-			// page: { 
-			// 	number: 1, 
-			// 	size: 10 
-			// }
+			}
 		});
 		if (!data) {
 			return []
@@ -165,4 +178,6 @@ export const subscriptionsRouter = createTRPCRouter({
 		
 		return billingsHistoryAdapter(data)
 	})
+
+
 })

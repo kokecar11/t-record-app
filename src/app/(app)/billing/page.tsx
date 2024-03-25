@@ -4,7 +4,6 @@ import { api } from '~/trpc/server'
 import { getServerAuthSession } from '~/server/auth'
 
 import BtnCancelSubscription from '~/app/_components/billing/btn-cancel-sub'
-import { Button } from '~/components/ui/button'
 import { DataTable } from '~/app/_components/billing/data-table'
 import { columns } from '~/app/_components/billing/columns'
 import { BtnUpgradeSub } from '~/app/_components/billing/btn-upgrade-sub'
@@ -71,6 +70,14 @@ export default async function Billing() {
 								</span>
 							)}
 						</div>
+						{subscription?.status && (
+							<div className="grid sm:flex-1">
+								<span className="text-sm text-gray-400">Current Status</span>
+								<span className="text-sm font-semibold capitalize text-white">
+									{subscription.status}
+								</span>
+							</div>
+						)}
 						{subscription?.renews_at && (
 							<div className="grid sm:flex-1">
 								<span className="text-sm text-gray-400">Renews at</span>
@@ -90,11 +97,13 @@ export default async function Billing() {
 					</div>
 				</div>
 				<div className="my-4 rounded-lg bg-[#15162c] p-2 shadow-lg">
-					<div className="mx-4 border-b border-white/50 pt-4">
-						<span className="text-xl font-bold">Billing History</span>
-						<h2 className="mb-1 text-sm text-gray-200">
-							Billing information history
-						</h2>
+					<div className="mx-4 flex border-b border-white/50 pt-4">
+						<div className="flex-1">
+							<span className="text-xl font-bold">Billing History</span>
+							<h2 className="mb-1 text-sm text-gray-200">
+								Billing information history
+							</h2>
+						</div>
 					</div>
 					<div className="p-4">
 						<DataTable columns={columns} data={billingHistory} />

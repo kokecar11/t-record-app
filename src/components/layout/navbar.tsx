@@ -13,7 +13,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
-import { LogOut, LayoutDashboard } from 'lucide-react'
+import { LogOut, LayoutDashboard, Wallet, Users } from 'lucide-react'
 
 export function Navbar() {
 	const { data: session } = useSession()
@@ -79,18 +79,18 @@ export function Navbar() {
 										<span>Dashboard</span>
 									</DropdownMenuItem>
 								</Link>
-								{/* <DropdownMenuItem className='cursor-pointer'>
-                                <User className="mr-2 h-4 w-4" />
-                                <span>Profile</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className='cursor-pointer'>
-                                <Wallet className="mr-2 h-4 w-4" />
-                                <span>Billing</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Users className="mr-2 h-4 w-4" />
-                                <span>Team</span>
-                            </DropdownMenuItem> */}
+								<Link href="/billing">
+									<DropdownMenuItem className="cursor-pointer">
+										<Wallet className="mr-2 h-4 w-4" />
+										<span>Billing</span>
+									</DropdownMenuItem>
+								</Link>
+								<Link href="/team">
+									<DropdownMenuItem className="cursor-pointer">
+										<Users className="mr-2 h-4 w-4" />
+										<span>Team</span>
+									</DropdownMenuItem>
+								</Link>
 							</DropdownMenuGroup>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem

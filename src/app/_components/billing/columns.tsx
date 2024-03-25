@@ -22,10 +22,9 @@ export const columns: ColumnDef<Billing>[] = [
 		accessorKey: 'status_formatted',
 		header: 'Status',
 		cell: ({ row }) => {
-			const status = row.getValue('status')
 			const status_formatted = row.getValue('status_formatted')
 			return (
-				<Badge variant={status === 'paid' ? 'success' : 'danger'}>
+				<Badge variant={status_formatted === 'Paid' ? 'success' : 'danger'}>
 					{status_formatted as string}
 				</Badge>
 			)

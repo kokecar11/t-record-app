@@ -1,10 +1,8 @@
-// import { postRouter } from "~/server/api/routers/post"
 import { createTRPCRouter } from "~/server/api/trpc"
 import { plansRouter } from "~/server/api/routers/plans"
 import { subscriptionsRouter } from "~/server/api/routers/subscription"
-import { accountRouter } from "~/server/api/routers/account";
-import { markerRouter } from "~/server/api/routers/marker";
-import { liveRouter } from "./routers/live";
+import { markerRouter } from "~/server/api/routers/marker"
+import { liveRouter } from "./routers/live"
 
 /**
  * This is the primary router for your server.
@@ -14,7 +12,6 @@ import { liveRouter } from "./routers/live";
 export const appRouter = createTRPCRouter({
   plans: plansRouter,
   subscriptions: subscriptionsRouter,
-  account: accountRouter,
   marker: markerRouter,
   live: liveRouter
 });
