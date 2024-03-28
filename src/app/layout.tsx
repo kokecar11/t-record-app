@@ -1,4 +1,5 @@
 import '~/styles/globals.css'
+import { GoogleTagManager } from '@next/third-parties/google'
 
 import { TRPCReactProvider } from '~/trpc/react'
 import { Inter } from 'next/font/google'
@@ -35,6 +36,7 @@ export default function RootLayout({
 				</TRPCReactProvider>
 				<Toaster />
 			</body>
+			<GoogleTagManager gtmId="GTM-MLT5XFTT" />
 		</html>
 	)
 }
