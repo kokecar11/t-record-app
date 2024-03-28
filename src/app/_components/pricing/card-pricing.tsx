@@ -67,7 +67,7 @@ export default function CardPricing({
 					{typePlan === 'STARTER' ? (
 						<Button
 							variant={'secondary-old'}
-							id={`${capitalizeFirstLetter(typePlan.toLowerCase())}-${capitalizeFirstLetter(typePlan.toString())}`}
+							id={`${capitalizeFirstLetter(typePlan.toLowerCase())}-${capitalizeFirstLetter(typeSubscription.toString())}`}
 							onClick={async () => {
 								if (session) {
 									router.push('/billing')
@@ -80,7 +80,7 @@ export default function CardPricing({
 					) : (
 						<Button
 							variant={'secondary-old'}
-							id={`${capitalizeFirstLetter(typePlan.toLowerCase())}-${capitalizeFirstLetter(typePlan.toLowerCase())}`}
+							id={`${capitalizeFirstLetter(typePlan.toLowerCase())}-${capitalizeFirstLetter(typeSubscription.toLowerCase())}`}
 							onClick={async () => {
 								if (session) {
 									if (session.user.plan !== 'STARTER') {
