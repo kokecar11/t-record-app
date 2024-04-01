@@ -4,7 +4,7 @@ import { api } from '~/trpc/server'
 import { getServerAuthSession } from '~/server/auth'
 
 import BtnCancelSubscription from '~/app/_components/billing/btn-cancel-sub'
-import { DataTable } from '~/app/_components/billing/data-table'
+import { DataTable } from '~/app/_components/data-table'
 import { columns } from '~/app/_components/billing/columns'
 import { BtnUpgradeSub } from '~/app/_components/billing/btn-upgrade-sub'
 
@@ -22,6 +22,8 @@ export default async function Billing() {
 	return (
 		<main className="container flex min-h-screen flex-col bg-background text-white">
 			<div className="container">
+				<h1 className="text-2xl font-bold">Plan & Billing</h1>
+
 				<div className="my-2 rounded-lg bg-primary/30 p-2 shadow-lg">
 					<div className="mx-4 flex items-center border-b border-white/50 pt-4">
 						<div className="flex-1">
