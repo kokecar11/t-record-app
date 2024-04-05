@@ -46,7 +46,11 @@ const formSchema = z.object({
 	}),
 })
 
-export function CreateMarkerForm() {
+interface CreateMarkerFormProps {
+	idTeam?: string
+}
+
+export function CreateMarkerForm({ idTeam }: CreateMarkerFormProps) {
 	const { toast } = useToast()
 	const [open, setOpen] = useState(false)
 	const queryClient = useQueryClient()
@@ -65,7 +69,11 @@ export function CreateMarkerForm() {
 	})
 
 	function onSubmit(values: z.infer<typeof formSchema>) {
-		mutate({ title: values.title, stream_date: values.stream_date })
+		mutate({
+			title: values.title,
+			stream_date: values.stream_date,
+			idTeam: idTeam,
+		})
 		toast({
 			title: 'Marker created',
 			description: 'Your marker has been created successfully.',

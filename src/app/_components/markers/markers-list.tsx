@@ -8,7 +8,11 @@ import { Loader } from '~/components/ui/loader'
 import type { Marker } from '@prisma/client'
 import type { Live } from '~/models'
 
-export default function Markerlist() {
+interface MarkerListProps {
+	idTeam?: string
+}
+
+export default function Markerlist({ idTeam }: MarkerListProps) {
 	const [markers, setMarkers] = useState<Marker[]>([])
 	const [live, setLive] = useState<Live>({ status: 'offline' })
 	const status = useFilters((state) => state.filters.status)
@@ -20,6 +24,7 @@ export default function Markerlist() {
 			status,
 			selectDayStream: selectedDate,
 		},
+		idTeam,
 	})
 
 	useEffect(() => {

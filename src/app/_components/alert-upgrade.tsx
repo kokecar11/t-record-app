@@ -9,13 +9,21 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
+	AlertDialogTrigger,
 } from '~/components/ui/alert-dialog'
 
-export default function AlertUpgrade() {
+interface AlertUpgradeProps {
+	defaultOpen?: boolean
+	children: React.ReactNode
+}
+export default function AlertUpgrade({
+	defaultOpen = false,
+	children,
+}: AlertUpgradeProps) {
 	const router = useRouter()
-
 	return (
-		<AlertDialog defaultOpen>
+		<AlertDialog defaultOpen={defaultOpen}>
+			{children && <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>}
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>

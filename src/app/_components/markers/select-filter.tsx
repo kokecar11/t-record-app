@@ -23,7 +23,7 @@ export default function SelectFilter() {
 			key={key}
 			defaultValue={status}
 			onValueChange={(status: StatusMarker) => setStatus(status)}>
-			<SelectTrigger className="w-full">
+			<SelectTrigger className="h-9 w-full">
 				<SelectValue placeholder="Select status" />
 			</SelectTrigger>
 			<SelectContent>
