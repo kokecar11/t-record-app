@@ -4,13 +4,23 @@ import { createTRPCRouter, protectedProcedure } from '~/server/api/trpc'
 
 export const markerRouter = createTRPCRouter({
 	create: protectedProcedure
-		.input(z.object({ title: z.string().min(1), stream_date: z.date() }))
+		.input(z.object({ title: z.string().min(1), stream_date: z.date(), idTeam: z.string().optional()}))
 		.mutation(async ({ ctx, input }) => {
+			const teamOwner = await ctx.db.team.findFirstOrThrow({
+				where: {
+					id: input.idTeam,
+				},
+				select: {
+					ownerId: true,
+				},
+			})
+			const userId = input.idTeam && teamOwner ? teamOwner.ownerId : ctx.session.user.id
+
 			return ctx.db.marker.create({
 				data: {
 					title: input.title,
 					stream_date: input.stream_date,
-					userId: ctx.session.user.id,
+					userId: userId
 				},
 			})
 		}),
@@ -18,6 +28,7 @@ export const markerRouter = createTRPCRouter({
 	getMarkers: protectedProcedure
 		.input(
 			z.object({
+				idTeam: z.string().optional(),
 				filters: z.object({
 					status: z.enum(['RECORDING', 'UNRECORDED', 'RECORDED']).optional(),
 					selectDayStream: z.date(),
@@ -25,9 +36,19 @@ export const markerRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+
+			const teamOwner = await ctx.db.team.findFirst({
+				where: {
+					id: input.idTeam,
+				},
+				select: {
+					ownerId: true,
+				},
+			})
+			const userId = teamOwner?.ownerId ? teamOwner.ownerId : ctx.session.user.id
 			const query = await ctx.db.marker.findMany({
 				where: {
-					userId: ctx.session.user.id,
+					userId,
 					status: input.filters?.status,
 					stream_date: input.filters?.selectDayStream,
 				},
@@ -35,10 +56,24 @@ export const markerRouter = createTRPCRouter({
 			return query
 		}),
 
-	getAllMarkersCalendar: protectedProcedure.query(async ({ ctx }) => {
+	getAllMarkersCalendar: protectedProcedure
+	.input(z.object({idTeam: z.string().optional(),}))
+	.query(async ({ ctx, input }) => {
+		
+		const teamOwner = await ctx.db.team.findFirst({
+			where: {
+				id: input.idTeam ? input.idTeam : '',
+			},
+			select: {
+				ownerId: true,
+			},
+		})
+		
+		const userId = teamOwner?.ownerId ? teamOwner.ownerId : ctx.session.user.id
+		
 		return await ctx.db.marker.findMany({
 			where: {
-				userId: ctx.session.user.id,
+				userId
 			},
 			select: {
 				stream_date: true,
@@ -54,12 +89,33 @@ export const markerRouter = createTRPCRouter({
 					title: z.string(),
 				}),
 				isStartMarker: z.boolean(),
+				teamId: z.string().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const urlApiTwitch = new URL(
 				'https://api.twitch.tv/helix/streams/markers',
 			)
+
+			const team = await ctx.db.team.findFirst({
+				where: {
+					id: input.teamId ?? '',
+				},
+				select: {
+					owner: {
+						select:{
+							accounts:{
+								select:{
+									userId: true,
+									providerAccountId: true,
+								}
+							}
+						}	
+					},
+				},
+			})
+			
+		
 			const account = await ctx.db.account.findFirst({
 				where: {
 					userId: ctx.session.user.id,
@@ -69,23 +125,27 @@ export const markerRouter = createTRPCRouter({
 					providerAccountId: true,
 				},
 			})
+			const providerAccountId = team?.owner.accounts[0]?.providerAccountId ? team?.owner.accounts[0]?.providerAccountId : account?.providerAccountId
 			const headers = {
 				Accept: 'application/json',
 				Authorization: 'Bearer ' + account?.access_token,
 				'Client-Id': env.TWITCH_CLIENT_ID,
 			}
-			if (account)
-				urlApiTwitch.searchParams.set('user_id', account?.providerAccountId)
+
+			if (providerAccountId)
+				urlApiTwitch.searchParams.set('user_id', providerAccountId)
 			urlApiTwitch.searchParams.set('description', input.marker.title)
 			const respStream = await fetch(`${urlApiTwitch.toString()}`, {
 				method: 'POST',
 				cache: 'force-cache',
 				headers,
 			})
+
 			const { data, status } = (await respStream.json()) as {
 				data: { position_seconds: number }[]
 				status: number
 			}
+			
 
 			if (status === 404) {
 				return {
@@ -100,7 +160,7 @@ export const markerRouter = createTRPCRouter({
 			if (input.isStartMarker) {
 				const updatedMarkerResult = await ctx.db.marker.update({
 					where: {
-						userId: ctx.session.user.id,
+						// userId: ctx.session.user.id,
 						id: input.marker.id,
 					},
 					data: {
@@ -117,7 +177,7 @@ export const markerRouter = createTRPCRouter({
 			} else {
 				const updatedMarkerResult = await ctx.db.marker.update({
 					where: {
-						userId: ctx.session.user.id,
+						// userId: ctx.session.user.id,
 						id: input.marker.id,
 					},
 					data: {
@@ -140,10 +200,29 @@ export const markerRouter = createTRPCRouter({
 					id: z.string(),
 				}),
 				isStartMarker: z.boolean(),
+				teamId: z.string().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const urlApiTwitch = new URL('https://api.twitch.tv/helix/videos')
+
+			const team = await ctx.db.team.findFirst({
+				where: {
+					id: input.teamId ?? '',
+				},
+				select: {
+					owner: {
+						select:{
+							accounts:{
+								select:{
+									userId: true,
+									providerAccountId: true,
+								}
+							}
+						}	
+					},
+				},
+			})
 			const account = await ctx.db.account.findFirst({
 				where: {
 					userId: ctx.session.user.id,
@@ -153,13 +232,15 @@ export const markerRouter = createTRPCRouter({
 					providerAccountId: true,
 				},
 			})
+
+			const providerAccountId = team?.owner.accounts[0]?.providerAccountId ? team?.owner.accounts[0]?.providerAccountId : account?.providerAccountId
 			const headers = {
 				Accept: 'application/json',
 				Authorization: 'Bearer ' + account?.access_token,
 				'Client-Id': env.TWITCH_CLIENT_ID,
 			}
 			if (account)
-				urlApiTwitch.searchParams.set('user_id', account?.providerAccountId)
+				urlApiTwitch.searchParams.set('user_id', providerAccountId!)
 			urlApiTwitch.searchParams.set('type', 'archive')
 			urlApiTwitch.searchParams.set('sort', 'time')
 			const respStream = await fetch(`${urlApiTwitch.toString()}`, {
@@ -180,7 +261,6 @@ export const markerRouter = createTRPCRouter({
 			if (input.isStartMarker) {
 				const updatedMarkerResultVOD = await ctx.db.marker.update({
 					where: {
-						userId: ctx.session.user.id,
 						id: input.marker.id,
 					},
 					data: {
@@ -195,7 +275,6 @@ export const markerRouter = createTRPCRouter({
 			} else {
 				const updatedMarkerResultVOD = await ctx.db.marker.update({
 					where: {
-						userId: ctx.session.user.id,
 						id: input.marker.id,
 					},
 					data: {

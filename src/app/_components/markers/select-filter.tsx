@@ -23,7 +23,7 @@ export default function SelectFilter() {
 			key={key}
 			defaultValue={status}
 			onValueChange={(status: StatusMarker) => setStatus(status)}>
-			<SelectTrigger className="h-9 w-full">
+			<SelectTrigger className="h-9 w-full hover:bg-secondary">
 				<SelectValue placeholder="Select status" />
 			</SelectTrigger>
 			<SelectContent>
@@ -31,18 +31,18 @@ export default function SelectFilter() {
 					<SelectItem value="RECORDING">Recording</SelectItem>
 					<SelectItem value="UNRECORDED">Unrecorded</SelectItem>
 					<SelectItem value="RECORDED">Recorded</SelectItem>
+					<Button
+						className="w-full"
+						variant="danger"
+						size="sm"
+						onClick={(e) => {
+							e.stopPropagation()
+							setStatus(undefined)
+							setKey(+new Date())
+						}}>
+						Clear status
+					</Button>
 				</SelectGroup>
-				<Button
-					className="w-full"
-					variant="danger"
-					size="sm"
-					onClick={(e) => {
-						e.stopPropagation()
-						setStatus(undefined)
-						setKey(+new Date())
-					}}>
-					Clear status
-				</Button>
 			</SelectContent>
 		</Select>
 	)

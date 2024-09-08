@@ -10,6 +10,7 @@ import {
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
+	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
@@ -72,6 +73,13 @@ export function Navbar() {
 							</Avatar>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent className="w-56">
+							<DropdownMenuLabel className="flex-col">
+								<p>{session.user.name}</p>
+								<p className="animate-hero-title font-semibold text-pink-600">
+									Plan {session.user.plan.toLowerCase()}
+								</p>
+							</DropdownMenuLabel>
+							<DropdownMenuSeparator />
 							<DropdownMenuGroup>
 								<Link href="/dashboard/">
 									<DropdownMenuItem className="cursor-pointer">
@@ -85,7 +93,7 @@ export function Navbar() {
 										<span>Billing</span>
 									</DropdownMenuItem>
 								</Link>
-								<Link href="/team">
+								<Link href="/teams">
 									<DropdownMenuItem className="cursor-pointer">
 										<Users className="mr-2 h-4 w-4" />
 										<span>Team</span>

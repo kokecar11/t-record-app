@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+
 import { cn } from '~/lib/utils'
 
 import { Button } from '~/components/ui/button'
@@ -40,8 +41,10 @@ import {
 	CommandGroup,
 	CommandInput,
 	CommandItem,
+	CommandSeparator,
 } from '~/components/ui/command'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
+import { CommandList } from 'cmdk'
 
 const formSchema = z.object({
 	inviteeId: z.string({
@@ -55,7 +58,11 @@ export function SendInvitationForm() {
 	const [users, setUsers] = useState<
 		{ id: string; name: string | undefined; image: string | undefined }[]
 	>([])
+	const [membersTwitch, setMembersTwitch] = useState<
+		{ id: string; name: string | undefined; image: string | undefined }[]
+	>([])
 	const queryClient = useQueryClient()
+	const { data: membersTwitchData } = api.team.membersTwitch.useQuery()
 
 	const { data } = api.user.getAllUsersTeams.useQuery()
 
@@ -68,7 +75,10 @@ export function SendInvitationForm() {
 			}))
 			setUsers(updatedData)
 		}
-	}, [data])
+		if (membersTwitchData) {
+			setMembersTwitch(membersTwitchData)
+		}
+	}, [data, membersTwitchData])
 
 	const { mutate } = api.team.sendInvitation.useMutation({
 		onSuccess: async () => {
@@ -83,8 +93,9 @@ export function SendInvitationForm() {
 		},
 	})
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
+	async function onSubmit(values: z.infer<typeof formSchema>) {
 		mutate({ inviteeId: values.inviteeId })
+
 		toast({
 			title: 'Team created',
 			description: 'Your team has been created successfully.',
@@ -129,9 +140,9 @@ export function SendInvitationForm() {
 														!field.value && 'text-muted-foreground',
 													)}>
 													{field.value
-														? users.find(
-																(language) => language.id === field.value,
-															)?.name
+														? users
+																.concat(membersTwitch)
+																.find((u) => u.id === field.value)?.name
 														: 'Select user to invite'}
 													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 												</Button>
@@ -140,39 +151,80 @@ export function SendInvitationForm() {
 										<PopoverContent className="w-full p-0">
 											<Command>
 												<CommandInput placeholder="Search user to invite..." />
-												<CommandEmpty>Not user found.</CommandEmpty>
-												<CommandGroup>
-													{users.map((user) => (
-														<CommandItem
-															value={user.name}
-															key={user.id}
-															onSelect={() => {
-																form.setValue('inviteeId', user.id)
-															}}>
-															<Check
-																className={cn(
-																	'mr-2 h-4 w-4',
-																	user.id === field.value
-																		? 'opacity-100'
-																		: 'opacity-0',
-																)}
-															/>
-															<Avatar className="mr-2 h-8 w-8 cursor-pointer">
-																<AvatarImage
-																	src={user.image}
-																	alt="profile-image"
+												<CommandList>
+													<CommandEmpty>User not found.</CommandEmpty>
+													<CommandGroup heading="T-Record moderators">
+														{users.map((user) => (
+															<CommandItem
+																value={user.name}
+																key={user.id}
+																onSelect={() => {
+																	form.setValue('inviteeId', user.id)
+																}}>
+																<Check
+																	className={cn(
+																		'mr-2 h-4 w-4',
+																		user.id === field.value
+																			? 'opacity-100'
+																			: 'opacity-0',
+																	)}
 																/>
-																<AvatarFallback>
-																	{user.name
-																		?.split(' ')
-																		.map((n: string) => n[0])
-																		.join('')}
-																</AvatarFallback>
-															</Avatar>
-															<span className="font-semibold">{user.name}</span>
-														</CommandItem>
-													))}
-												</CommandGroup>
+																<Avatar className="mr-2 h-8 w-8 cursor-pointer">
+																	<AvatarImage
+																		src={user.image}
+																		alt="profile-image"
+																	/>
+																	<AvatarFallback>
+																		{user.name
+																			?.split(' ')
+																			.map((n: string) => n[0])
+																			.join('')}
+																	</AvatarFallback>
+																</Avatar>
+																<span className="font-semibold">
+																	{user.name}
+																</span>
+															</CommandItem>
+														))}
+													</CommandGroup>
+													<CommandSeparator />
+													<CommandGroup heading="Twitch moderators">
+														{membersTwitch.map((user) => (
+															<CommandItem
+																value={user.name}
+																key={user.id}
+																onSelect={async () => {
+																	//TODO: Send invitation to email
+
+																	form.setValue('inviteeId', user.id)
+																}}>
+																<Check
+																	className={cn(
+																		'mr-2 h-4 w-4',
+																		user.id === field.value
+																			? 'opacity-100'
+																			: 'opacity-0',
+																	)}
+																/>
+																<Avatar className="mr-2 h-8 w-8 cursor-pointer">
+																	<AvatarImage
+																		src={undefined}
+																		alt="profile-image"
+																	/>
+																	<AvatarFallback>
+																		{user.name
+																			?.split(' ')
+																			.map((n: string) => n[0])
+																			.join('')}
+																	</AvatarFallback>
+																</Avatar>
+																<span className="font-semibold">
+																	{user.name}
+																</span>
+															</CommandItem>
+														))}
+													</CommandGroup>
+												</CommandList>
 											</Command>
 										</PopoverContent>
 									</Popover>

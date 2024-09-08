@@ -19,17 +19,22 @@ export interface MarkerProps {
 	marker: Marker
 	onMarkerUpdate: (marker: Marker) => void
 	live: Live
+	teamId: string
 }
 
 export default function MarkerCard({
 	marker,
 	onMarkerUpdate,
 	live,
+	teamId,
 }: MarkerProps) {
 	const { data: session } = useSession()
 	const queryClient = useQueryClient()
 
-	const [btnMarker] = useState<{ title: string; isInit: boolean }>(() => {
+	const [btnMarker, setBtnMarker] = useState<{
+		title: string
+		isInit: boolean
+	}>(() => {
 		const savedState = localStorage.getItem('btnMarker-' + marker.id)
 		if (savedState) {
 			return JSON.parse(savedState) as { title: string; isInit: boolean }
@@ -78,6 +83,7 @@ export default function MarkerCard({
 						title: marker.title,
 					},
 					isStartMarker: btnMarker.isInit,
+					teamId: teamId ?? '',
 				})
 
 			if (updatedMarkerResult) {
@@ -87,6 +93,7 @@ export default function MarkerCard({
 							id: marker.id,
 						},
 						isStartMarker: btnMarker.isInit,
+						teamId: teamId ?? '',
 					})
 
 				if (updatedMarkerResult.status === 'RECORDING') {
@@ -94,6 +101,7 @@ export default function MarkerCard({
 						'btnMarker-' + marker.id,
 						JSON.stringify({ title: 'Stop record', isInit: false }),
 					)
+					setBtnMarker({ title: 'Stop record', isInit: false })
 				}
 
 				showToast(title, message)
@@ -128,7 +136,7 @@ export default function MarkerCard({
 
 	return (
 		<div
-			className={`max-w-2xl overflow-hidden rounded-lg border bg-primary-old shadow-lg`}>
+			className={`max-w-2xl overflow-hidden rounded-lg bg-background shadow-lg`}>
 			<div className="relative p-4">
 				<div className="mb-2 flex">
 					<div className="flex-1 space-x-2">

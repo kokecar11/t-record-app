@@ -55,6 +55,7 @@ model User {
     teams         Team[]
     inviter       Invitation[]  @relation("UserInviter")
     invitee       Invitation[] @relation("UserInvitee")
+    usersOnTeams         UsersOnTeams[]
 }
 
 model VerificationToken {
@@ -115,11 +116,12 @@ model Marker {
 }
 
 model Team {
-    id                 String  @id @default(cuid())
+    id                 String @id @default(cuid())
     name               String
-    ownerId            String  @unique
-    owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-    invitations Invitation[]
+    ownerId            String @unique
+    owner              User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    invitations        Invitation[]
+    users              UsersOnTeams[]
 }
 
 model Invitation {
@@ -128,10 +130,23 @@ model Invitation {
     inviterId          String
     inviteeId          String
     status             StatusInvitations @default(pending)
+    sentAt             DateTime  @default(now())
 
-    team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
-    inviter User @relation(fields: [inviterId], references: [id], onDelete: Cascade, name: "UserInviter")
-    invitee User @relation(fields: [inviteeId], references: [id], onDelete: Cascade, name: "UserInvitee")
+    team               Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+    inviter            User @relation(fields: [inviterId], references: [id], onDelete: Cascade, name: "UserInviter")
+    invitee            User @relation(fields: [inviteeId], references: [id], onDelete: Cascade, name: "UserInvitee")
+}
+
+model UsersOnTeams {
+    id             String          @id @default(cuid())
+    userId         String
+    teamId         String
+    status         StatusInvitations @default(pending)
+    role           Role
+    permissions    Permission[]
+
+    user           User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    team           Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 
 enum StatusMarker {
@@ -165,4 +180,23 @@ enum StatusInvitations {
     rejected
     pending
     accepted
+}
+
+enum Role {
+    OWNER
+    MODERATOR
+    MEMBER
+    EDITOR
+}
+
+enum Permission {
+    TEAM_EDIT
+    TEAM_DELETE
+    TEAM_USER_INVITE
+    TEAM_USER_REMOVE
+    TEAM_USER_EDIT
+    TEAM_MARKER_CREATE
+    TEAM_MARKER_DELETE
+    TEAM_MARKER_EDIT
+    TEAM_MARKER_VIEW
 }

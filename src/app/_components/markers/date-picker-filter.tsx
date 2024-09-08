@@ -15,9 +15,13 @@ import {
 import useFilters from '~/store/useFilters'
 import { api } from '~/trpc/react'
 
-export function DatePickerFilter() {
+interface DatePickerFilterProps {
+	idTeam?: string
+}
+
+export function DatePickerFilter({ idTeam }: DatePickerFilterProps) {
 	const date = useFilters((state) => state.filters.selectDayStream)
-	const { data } = api.marker.getAllMarkersCalendar.useQuery()
+	const { data } = api.marker.getAllMarkersCalendar.useQuery({ idTeam })
 	const [markers, setMarkers] = useState<MarkerDate[]>([])
 
 	useEffect(() => {

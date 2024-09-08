@@ -47,10 +47,10 @@ const formSchema = z.object({
 })
 
 interface CreateMarkerFormProps {
-	idTeam?: string
+	teamId?: string
 }
 
-export function CreateMarkerForm({ idTeam }: CreateMarkerFormProps) {
+export function CreateMarkerForm({ teamId }: CreateMarkerFormProps) {
 	const { toast } = useToast()
 	const [open, setOpen] = useState(false)
 	const queryClient = useQueryClient()
@@ -72,7 +72,7 @@ export function CreateMarkerForm({ idTeam }: CreateMarkerFormProps) {
 		mutate({
 			title: values.title,
 			stream_date: values.stream_date,
-			idTeam: idTeam,
+			idTeam: teamId,
 		})
 		toast({
 			title: 'Marker created',
@@ -96,6 +96,7 @@ export function CreateMarkerForm({ idTeam }: CreateMarkerFormProps) {
 					<DialogTitle>New Marker</DialogTitle>
 					<DialogDescription>
 						Create a new marker to help you organize your content.
+						{teamId && ' This marker will be associated with your team.'}
 					</DialogDescription>
 				</DialogHeader>
 				<Form {...form}>

@@ -5,22 +5,22 @@ import { Badge } from '~/components/ui/badge'
 import { type Members, type Team } from '~/adapters/team.adapter'
 import { type ColumnDef } from '@tanstack/react-table'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
+import { SettingsUserTeam } from './settings-user-team'
 
 export const columnsMembers: ColumnDef<Members>[] = [
 	{
 		accessorKey: 'name',
 		header: 'Name',
 		cell: ({ row }) => {
-			const userImage = row.original.image!
-			const initalName: string = row.getValue('name')
-			const name: string = row.getValue('name')
+			const userImage = row.original.user.image!
+			const name: string = row.original.user.name!
 
 			return (
 				<div className="flex items-center">
 					<Avatar className="mr-2 cursor-pointer">
 						<AvatarImage src={userImage} alt="profile-image" />
 						<AvatarFallback>
-							{initalName
+							{name
 								.split(' ')
 								.map((n: string) => n[0])
 								.join('')}
@@ -32,8 +32,21 @@ export const columnsMembers: ColumnDef<Members>[] = [
 		},
 	},
 	{
-		accessorKey: 'status',
-		header: 'Role',
+		accessorKey: 'role',
+		header: 'Role & Stream Role',
+		cell: ({ row }) => {
+			const role: string = row.getValue('role')
+			const streamRole: string =
+				role === 'OWNER' ? 'Streamer' : row.getValue('role')
+			return (
+				<div className="flex gap-1">
+					<Badge variant={'secondary'} className="capitalize">
+						{role.toLocaleLowerCase()}
+					</Badge>
+					<Badge className="capitalize">{streamRole.toLocaleLowerCase()}</Badge>
+				</div>
+			)
+		},
 	},
 	{
 		accessorKey: 'status',
@@ -55,6 +68,19 @@ export const columnsMembers: ColumnDef<Members>[] = [
 			)
 		},
 	},
+	{
+		accessorKey: 'actions',
+		header: 'Actions',
+		cell: ({ row }) => {
+			return (
+				<SettingsUserTeam
+					userId={row.original.user.id}
+					permissions={row.original.permissions}
+					role={row.original.role}
+				/>
+			)
+		},
+	},
 ]
 
 export const columnsTeams: ColumnDef<Team>[] = [
@@ -71,6 +97,14 @@ export const columnsTeams: ColumnDef<Team>[] = [
 			)
 		},
 	},
+	{
+		accessorKey: 'totalMembers',
+		header: 'Total Members',
+	},
+	// {
+	// 	accessorKey: 'description',
+	// 	header: 'Description',
+	// }
 ]
 
 // export const columnsInvitations: ColumnDef<{}>[] = [

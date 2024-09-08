@@ -11,19 +11,18 @@ export const metadata: Metadata = {
 
 export default async function Dashboard() {
 	return (
-		<main className="container flex min-h-screen flex-col bg-background text-white">
+		<main className="container flex min-h-screen flex-col text-white">
 			<div className="container">
-				<h1 className="text-2xl font-bold">Dashboard</h1>
-				<div className="mb-3 border border-b border-white"></div>
-				<div className="my-1 gap-y-4 sm:flex sm:space-x-4">
-					<div className="grid gap-y-4 sm:flex sm:flex-1 sm:space-x-4">
-						<CreateMarkerForm />
-					</div>
+				<div className="my-1 gap-y-4 rounded-lg bg-background p-4 shadow-lg sm:flex sm:space-x-4">
+					<h1 className="text-2xl font-bold">Dashboard</h1>
+					<div className="grid gap-y-4 sm:flex sm:flex-1 sm:space-x-4"></div>
 					<div className="mt-4 flex items-center justify-center space-x-4 sm:m-0">
+						<CreateMarkerForm />
 						<DatePickerFilter />
 						<SelectFilter />
 					</div>
 				</div>
+				{/* <div className="my-3 border border-b border-white"></div> */}
 				<Markerlist />
 			</div>
 		</main>

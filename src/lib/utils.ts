@@ -22,7 +22,7 @@ export const validateMarker = (
 	if (!isSameDay(streamDate, now)) return true
 
 	if (status === 'RECORDED') return true
-
+	
 	if (status === 'RECORDED' || live.status === 'offline')
 		if (isInit) return true
 

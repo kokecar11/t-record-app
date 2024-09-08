@@ -137,7 +137,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: env.TWITCH_CLIENT_SECRET,
       authorization: {
         params : {
-          scope:'openid user:read:email channel:manage:broadcast user:read:broadcast channel_read'
+          scope:'openid user:read:email user:read:broadcast channel:manage:broadcast channel:manage:moderators channel:read:editors'
         }
       },
     }),
