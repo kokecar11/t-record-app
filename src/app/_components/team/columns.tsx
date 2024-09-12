@@ -36,14 +36,17 @@ export const columnsMembers: ColumnDef<Members>[] = [
 		header: 'Role & Stream Role',
 		cell: ({ row }) => {
 			const role: string = row.getValue('role')
-			const streamRole: string =
-				role === 'OWNER' ? 'Streamer' : row.getValue('role')
+			const streamRole: string[] = row.original.roleStream
 			return (
 				<div className="flex gap-1">
 					<Badge variant={'secondary'} className="capitalize">
 						{role.toLocaleLowerCase()}
 					</Badge>
-					<Badge className="capitalize">{streamRole.toLocaleLowerCase()}</Badge>
+					{streamRole.map((role: string) => (
+						<Badge key={role} className="capitalize">
+							{role.toLocaleLowerCase()}
+						</Badge>
+					))}
 				</div>
 			)
 		},
@@ -101,34 +104,4 @@ export const columnsTeams: ColumnDef<Team>[] = [
 		accessorKey: 'totalMembers',
 		header: 'Total Members',
 	},
-	// {
-	// 	accessorKey: 'description',
-	// 	header: 'Description',
-	// }
 ]
-
-// export const columnsInvitations: ColumnDef<{}>[] = [
-// 	{
-// 		accessorKey: 'inviteer',
-// 		header: 'Inviteer',
-// 		cell: ({ row }) => {
-// 			const userImage = row.original.image!
-// 			const initalName: string = row.getValue('name')
-// 			const name: string = row.getValue('name')
-// 			return (
-// 				<div className="flex items-center">
-// 					<Avatar className="mr-2 cursor-pointer">
-// 						<AvatarImage src={userImage} alt="profile-image" />
-// 						<AvatarFallback>
-// 							{initalName
-// 								.split(' ')
-// 								.map((n: string) => n[0])
-// 								.join('')}
-// 						</AvatarFallback>
-// 					</Avatar>
-// 					<span className="text-sm font-semibold text-white">{name}</span>
-// 				</div>
-// 			)
-// 		},
-// 	},
-// ]

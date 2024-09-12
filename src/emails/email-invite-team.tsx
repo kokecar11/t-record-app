@@ -14,13 +14,11 @@ import { FeGithub, FeHeart, FeInstagram, FeTwitter } from '~/components/icons'
 
 interface EmailInviteTeamProps {
 	userInviter: string | undefined | null
-	userInvitee: string
 	teamName: string
 	url: string
 }
 export function EmailInviteTeam({
 	userInviter,
-	userInvitee,
 	teamName,
 	url,
 }: EmailInviteTeamProps) {
@@ -61,7 +59,7 @@ export function EmailInviteTeam({
 								fontWeight: 'bold',
 								marginBottom: '20px',
 							}}>
-							Hi {userInvitee},
+							Hi,
 						</Text>
 						<Text
 							style={{

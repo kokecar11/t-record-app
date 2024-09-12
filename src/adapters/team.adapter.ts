@@ -7,6 +7,7 @@ export type Members = {
         id: string
     }
 	role: Role
+	roleStream: string[]
 	status: StatusInvitations
     permissions: Permission[]
 }
@@ -28,21 +29,5 @@ export type Invitation = {
         name: string | null;
         image: string | null;
     }
-}
-
-export const membersTeamAdapter = (members: {
-    status: StatusInvitations 
-    invitee: {
-        name: string | null
-        image: string | null
-    }
-}[] ) => {
-    const listMembers: Members[] = []
-    members.map((m) => listMembers.push({
-        name: m.invitee.name,
-        image: m.invitee.image,
-        status: m.status,
-    }))
-    return listMembers
 }
 

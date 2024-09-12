@@ -1,8 +1,12 @@
 'use client'
+
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
+import { useQueryClient } from '@tanstack/react-query'
+import { api } from '~/trpc/react'
 import Live from '~/app/_components/live'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import {
@@ -11,16 +15,54 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
+	DropdownMenuPortal,
 	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { Skeleton } from '../ui/skeleton'
-import { LogOut, LayoutDashboard, Wallet, Users } from 'lucide-react'
+import {
+	LogOut,
+	LayoutDashboard,
+	Wallet,
+	Users,
+	Bell,
+	X,
+	Check,
+	PlusCircle,
+	BellDot,
+} from 'lucide-react'
 import { Button } from '../ui/button'
 
+import { CreateTeamForm } from '~/app/_components/team/create-team-form'
+import AlertUpgrade from '~/app/_components/alert-upgrade'
+
 export function NavbarApp() {
+	const [teams, setTeams] = useState<
+		{
+			id: string
+			name: string
+			image: string
+			isOwner: boolean
+		}[]
+	>([])
+	const [invitations, setInvitations] = useState<
+		{
+			id: string
+			inviter: {
+				name: string | null
+				image: string | null
+			}
+		}[]
+	>([])
 	const { data: session } = useSession()
 	const router = useRouter()
+
+	const { data: allTeamsData } = api.team.myTeams.useQuery()
+	const { data: allInvitations } = api.team.invitations.useQuery()
+	const queryClient = useQueryClient()
 
 	const userImage = session?.user?.image as string | undefined
 	const initalName = session?.user?.name
@@ -28,7 +70,20 @@ export function NavbarApp() {
 		.map((n: string) => n[0])
 		.join('')
 	const handlerNav = () => router.push('/billing/', { scroll: false })
+	const { mutate } = api.team.acceptOrRejectInvitation.useMutation({
+		onSuccess: async () => {
+			await queryClient.invalidateQueries()
+		},
+	})
 
+	useEffect(() => {
+		if (allTeamsData) {
+			setTeams(allTeamsData)
+		}
+		if (allInvitations) {
+			setInvitations(allInvitations)
+		}
+	}, [allTeamsData, allInvitations])
 	return (
 		<nav className="container sticky top-0 z-10 flex w-full items-center justify-between bg-transparent px-4 py-1.5 backdrop-blur-lg backdrop-filter sm:px-14">
 			<Link href="/" className="flex items-center">
@@ -55,6 +110,66 @@ export function NavbarApp() {
 					<Skeleton className="h-[22px] w-[66px] rounded-full"></Skeleton>
 				)}
 				<Live teamId="" />
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant="ghost">
+							<Bell className="h-4 w-4" />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent className="w-full">
+						<DropdownMenuLabel className="flex-col">
+							Notifications
+						</DropdownMenuLabel>
+						<DropdownMenuSeparator />
+						<DropdownMenuGroup>
+							{invitations.map((invitation) => (
+								<DropdownMenuItem key={invitation.id}>
+									<BellDot className="mx-4 h-4 w-4" />
+									<div>
+										<div className="flex place-items-center">
+											<Avatar className="mr-2 h-6 w-6">
+												<AvatarImage
+													src={invitation.inviter.image!}
+													alt="profile-image"
+												/>
+												<AvatarFallback>
+													{invitation.inviter.name?.split(' ').map((n) => n[0])}
+												</AvatarFallback>
+											</Avatar>
+											<span>{invitation.inviter.name}</span>
+										</div>
+
+										<p className="mr-2">Invited you to join the team</p>
+									</div>
+
+									<div className="flex gap-2">
+										<Button
+											size={'icon'}
+											onClick={() =>
+												mutate({
+													invitationId: invitation.id,
+													status: 'accepted',
+												})
+											}>
+											<Check className="h-4 w-4" />
+										</Button>
+										<Button
+											size={'icon'}
+											variant={'destructive'}
+											onClick={() =>
+												mutate({
+													invitationId: invitation.id,
+													status: 'rejected',
+												})
+											}>
+											<X className="h-4 w-4" />
+										</Button>
+									</div>
+								</DropdownMenuItem>
+							))}
+						</DropdownMenuGroup>
+					</DropdownMenuContent>
+				</DropdownMenu>
 				<div className="">
 					{session?.user?.image ? (
 						<DropdownMenu>
@@ -91,12 +206,46 @@ export function NavbarApp() {
 											<span>Billing</span>
 										</DropdownMenuItem>
 									</Link>
-									<Link href="/teams">
-										<DropdownMenuItem className="cursor-pointer">
+									<DropdownMenuSub>
+										<DropdownMenuSubTrigger className="cursor-pointer">
 											<Users className="mr-2 h-4 w-4" />
-											<span>Team</span>
-										</DropdownMenuItem>
-									</Link>
+											<span>Teams</span>
+										</DropdownMenuSubTrigger>
+										<DropdownMenuPortal>
+											<DropdownMenuSubContent>
+												{teams?.map((team) => (
+													<Link key={team.id} href={`/team/${team.id}`}>
+														<DropdownMenuItem className="cursor-pointer">
+															<Avatar className="mr-2 h-4 w-4">
+																<AvatarImage
+																	src={team.image}
+																	alt="profile-image"
+																/>
+															</Avatar>
+															<span className="mr-2">{team.name}</span>
+															<Live teamId={team.id} showLabel={false} />
+														</DropdownMenuItem>
+													</Link>
+												))}
+												<DropdownMenuSeparator />
+												{session?.user.plan === 'STARTER' ? (
+													<AlertUpgrade>
+														<DropdownMenuItem
+															className="cursor-pointer"
+															asChild
+															onSelect={(e) => e.preventDefault()}>
+															<span>
+																<PlusCircle className="mr-2 h-4 w-4" />
+																Create a Team
+															</span>
+														</DropdownMenuItem>
+													</AlertUpgrade>
+												) : (
+													<CreateTeamForm />
+												)}
+											</DropdownMenuSubContent>
+										</DropdownMenuPortal>
+									</DropdownMenuSub>
 								</DropdownMenuGroup>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem

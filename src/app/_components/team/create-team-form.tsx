@@ -26,9 +26,10 @@ import {
 import { api } from '~/trpc/react'
 import { DialogClose } from '@radix-ui/react-dialog'
 
-import { Plus } from 'lucide-react'
+import { PlusCircle } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useToast } from '~/components/ui/use-toast'
+import { DropdownMenuItem } from '~/components/ui/dropdown-menu'
 
 const formSchema = z.object({
 	name: z.string().min(2, {
@@ -54,12 +55,25 @@ export function CreateTeamForm() {
 	})
 
 	function onSubmit(values: z.infer<typeof formSchema>) {
-		mutate({ name: values.name })
-		toast({
-			title: 'Team created',
-			description: 'Your team has been created successfully.',
-			variant: 'default',
-		})
+		mutate(
+			{ name: values.name },
+			{
+				onSuccess: () => {
+					toast({
+						title: 'Team created',
+						description: 'Your team has been created successfully.',
+						variant: 'default',
+					})
+				},
+				onError: (error) => {
+					toast({
+						title: 'Error creating team',
+						description: error.message,
+						variant: 'destructive',
+					})
+				},
+			},
+		)
 		form.reset()
 		setOpen(false)
 	}
@@ -67,10 +81,15 @@ export function CreateTeamForm() {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button variant={'default'}>
-					<Plus className="mr-2 h-4 w-4" />
-					Create Team
-				</Button>
+				<DropdownMenuItem
+					className="cursor-pointer"
+					asChild
+					onSelect={(e) => e.preventDefault()}>
+					<span>
+						<PlusCircle className="mr-2 h-4 w-4" />
+						Create a Team
+					</span>
+				</DropdownMenuItem>
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>

@@ -42,6 +42,7 @@ import { api } from '~/trpc/react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
+import { ScrollArea } from '~/components/ui/scroll-area'
 
 const formSchema = z.object({
 	team_marker_view: z.boolean(),
@@ -167,260 +168,264 @@ export function SettingsUserTeam({
 					<Settings2 className=" h-4 w-4" />
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="max-w-3xl">
-				<DialogHeader>
-					<DialogTitle>User team settings</DialogTitle>
-					<DialogDescription>
-						Configure the permissions of the user in the team & markers
-					</DialogDescription>
-				</DialogHeader>
-				<Form {...form}>
-					<form
-						onSubmit={form.handleSubmit(onSubmit)}
-						className="w-full space-y-4">
-						<div className="grid gap-1">
-							<div className="text-md font-semibold">Team configuration</div>
-							<p className="text-sm text-muted-foreground">
-								Configure the permissions of the user in the team
-							</p>
-							<Separator className="" />
-						</div>
-						<FormField
-							control={form.control}
-							name="role"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Role</FormLabel>
-									<Select
-										disabled={isFieldDisabled()}
-										onValueChange={(value: Role) => {
-											allPermissions.map((permission: Permission) => {
-												form.setValue(
-													permission.toLowerCase() as keyof z.infer<
-														typeof formSchema
-													>,
-													false,
-												)
-											})
-											defaultRolesWithPermissions[value].map(
-												(permission: Permission) => {
+			<DialogContent className="max-w-4xl">
+				<ScrollArea className="h-96 w-full p-4">
+					<DialogHeader>
+						<DialogTitle>User team settings</DialogTitle>
+						<DialogDescription>
+							Configure the permissions of the user in the team & markers
+						</DialogDescription>
+					</DialogHeader>
+					<Form {...form}>
+						<form
+							onSubmit={form.handleSubmit(onSubmit)}
+							className="w-full space-y-4">
+							<div className="grid gap-1">
+								<div className="text-md font-semibold">Team configuration</div>
+								<p className="text-sm text-muted-foreground">
+									Configure the permissions of the user in the team
+								</p>
+								<Separator className="" />
+							</div>
+							<FormField
+								control={form.control}
+								name="role"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Role</FormLabel>
+										<Select
+											disabled={isFieldDisabled()}
+											onValueChange={(value: Role) => {
+												allPermissions.map((permission: Permission) => {
 													form.setValue(
 														permission.toLowerCase() as keyof z.infer<
 															typeof formSchema
 														>,
-														true,
+														false,
 													)
-												},
-											)
-											field.onChange(value)
-										}}
-										defaultValue={field.value}>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder="Select role" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											{roles
-												.filter((v) => v !== 'OWNER')
-												.map((r) => (
-													<SelectItem key={r} value={r}>
-														{r}
-													</SelectItem>
-												))}
-										</SelectContent>
-									</Select>
-									<FormDescription>
-										Users with OWNER access can manage team settings
-										<br />
-										<br />
-										{form.getValues('role') === 'EDITOR' && (
-											<Alert variant={'warning'}>
-												<AlertTriangle className="h-4 w-4" />
-												<AlertTitle>
-													Action Required: Editor Role Configuration on Twitch
-												</AlertTitle>
-												<AlertDescription>
-													To ensure you have the correct permissions, please
-													configure your Editor role on Twitch. Simply go to the
-													role settings and make the necessary changes.{' '}
-													<Link
-														target="_blank"
-														className="text-yellow-500 underline"
-														href={`https://dashboard.twitch.tv/u/${session?.user.name}/community/roles`}>
-														Go to change role.
-													</Link>
-												</AlertDescription>
-											</Alert>
-										)}
-									</FormDescription>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<div className="grid grid-cols-2 gap-4">
-							<FormField
-								control={form.control}
-								name="team_user_invite"
-								render={({ field }) => (
-									<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-										<div className="space-y-0.5">
-											<FormLabel>Invite users to the team</FormLabel>
-											<FormDescription>
-												Users with invite access can invite other users to the
-												team
-											</FormDescription>
-										</div>
-										<FormControl>
-											<Switch
-												disabled={isFieldDisabled()}
-												checked={field.value}
-												onCheckedChange={field.onChange}
-											/>
-										</FormControl>
+												})
+												defaultRolesWithPermissions[value].map(
+													(permission: Permission) => {
+														form.setValue(
+															permission.toLowerCase() as keyof z.infer<
+																typeof formSchema
+															>,
+															true,
+														)
+													},
+												)
+												field.onChange(value)
+											}}
+											defaultValue={field.value}>
+											<FormControl>
+												<SelectTrigger>
+													<SelectValue placeholder="Select role" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												{roles
+													.filter((v) => v !== 'OWNER')
+													.map((r) => (
+														<SelectItem key={r} value={r}>
+															{r}
+														</SelectItem>
+													))}
+											</SelectContent>
+										</Select>
+										<FormDescription>
+											Users with OWNER access can manage team settings
+											<br />
+											<br />
+											{form.getValues('role') === 'EDITOR' && (
+												<Alert variant={'warning'}>
+													<AlertTriangle className="h-4 w-4" />
+													<AlertTitle>
+														Action Required: Editor Role Configuration on Twitch
+													</AlertTitle>
+													<AlertDescription>
+														To ensure you have the correct permissions, please
+														configure your Editor role on Twitch. Simply go to
+														the role settings and make the necessary changes.{' '}
+														<Link
+															target="_blank"
+															className="text-yellow-500 underline"
+															href={`https://dashboard.twitch.tv/u/${session?.user.name}/community/roles`}>
+															Go to change role.
+														</Link>
+													</AlertDescription>
+												</Alert>
+											)}
+										</FormDescription>
+										<FormMessage />
 									</FormItem>
 								)}
 							/>
+							<div className="grid grid-cols-2 gap-4">
+								<FormField
+									control={form.control}
+									name="team_user_invite"
+									render={({ field }) => (
+										<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+											<div className="space-y-0.5">
+												<FormLabel>Invite users to the team</FormLabel>
+												<FormDescription>
+													Users with invite access can invite other users to the
+													team
+												</FormDescription>
+											</div>
+											<FormControl>
+												<Switch
+													disabled={isFieldDisabled()}
+													checked={field.value}
+													onCheckedChange={field.onChange}
+												/>
+											</FormControl>
+										</FormItem>
+									)}
+								/>
 
-							<FormField
-								control={form.control}
-								name="team_user_edit"
-								render={({ field }) => (
-									<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-										<div className="space-y-0.5">
-											<FormLabel>Modify user permissions and role</FormLabel>
-											<FormDescription>
-												Users with modify user access can modify user
-												permissions and role
-											</FormDescription>
-										</div>
-										<FormControl>
-											<Switch
-												disabled={isFieldDisabled()}
-												checked={field.value}
-												onCheckedChange={field.onChange}
-											/>
-										</FormControl>
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="team_user_remove"
-								render={({ field }) => (
-									<FormItem className="col-span-2 flex flex-row items-center justify-between rounded-lg border p-4">
-										<div className="space-y-0.5">
-											<FormLabel>Remove users from the team</FormLabel>
-											<FormDescription>
-												Users with remove access can remove users from the team
-											</FormDescription>
-										</div>
-										<FormControl>
-											<Switch
-												disabled={isFieldDisabled()}
-												checked={field.value}
-												onCheckedChange={field.onChange}
-											/>
-										</FormControl>
-									</FormItem>
-								)}
-							/>
-						</div>
-						<div className="grid gap-1">
-							<div className="text-md font-semibold">Markers configuration</div>
-							<p className="text-sm text-muted-foreground">
-								Configure the permissions of the user in the markers
-							</p>
-							<Separator className="" />
-						</div>
-						<div className="grid grid-cols-2 gap-4">
-							<FormField
-								control={form.control}
-								name="team_marker_view"
-								render={({ field }) => (
-									<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-										<div className="space-y-0.5">
-											<FormLabel>Read Marker</FormLabel>
-											<FormDescription>
-												Users with read marker access can view markers
-											</FormDescription>
-										</div>
-										<FormControl>
-											<Switch
-												disabled={isFieldDisabled()}
-												checked={field.value}
-												onCheckedChange={field.onChange}
-											/>
-										</FormControl>
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="team_marker_create"
-								render={({ field }) => (
-									<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-										<div className="space-y-0.5">
-											<FormLabel>Create Marker</FormLabel>
-											<FormDescription>
-												Users with create marker access can create new markers
-											</FormDescription>
-										</div>
-										<FormControl>
-											<Switch
-												disabled={isFieldDisabled()}
-												checked={field.value}
-												onCheckedChange={field.onChange}
-											/>
-										</FormControl>
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="team_marker_edit"
-								render={({ field }) => (
-									<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-										<div className="space-y-0.5">
-											<FormLabel>Modify Marker</FormLabel>
-											<FormDescription>
-												Users with modify marker access can modify markers
-											</FormDescription>
-										</div>
-										<FormControl>
-											<Switch
-												disabled={isFieldDisabled()}
-												checked={field.value}
-												onCheckedChange={field.onChange}
-											/>
-										</FormControl>
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="team_marker_delete"
-								render={({ field }) => (
-									<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-										<div className="space-y-0.5">
-											<FormLabel>Delete marker</FormLabel>
-											<FormDescription>
-												Users with delete marker access can delete markers
-											</FormDescription>
-										</div>
-										<FormControl>
-											<Switch
-												disabled={isFieldDisabled()}
-												checked={field.value}
-												onCheckedChange={field.onChange}
-											/>
-										</FormControl>
-									</FormItem>
-								)}
-							/>
-						</div>
+								<FormField
+									control={form.control}
+									name="team_user_edit"
+									render={({ field }) => (
+										<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+											<div className="space-y-0.5">
+												<FormLabel>Modify user permissions and role</FormLabel>
+												<FormDescription>
+													Users with modify user access can modify user
+													permissions and role
+												</FormDescription>
+											</div>
+											<FormControl>
+												<Switch
+													disabled={isFieldDisabled()}
+													checked={field.value}
+													onCheckedChange={field.onChange}
+												/>
+											</FormControl>
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="team_user_remove"
+									render={({ field }) => (
+										<FormItem className="col-span-2 flex flex-row items-center justify-between rounded-lg border p-4">
+											<div className="space-y-0.5">
+												<FormLabel>Remove users from the team</FormLabel>
+												<FormDescription>
+													Users with remove access can remove users from the
+													team
+												</FormDescription>
+											</div>
+											<FormControl>
+												<Switch
+													disabled={isFieldDisabled()}
+													checked={field.value}
+													onCheckedChange={field.onChange}
+												/>
+											</FormControl>
+										</FormItem>
+									)}
+								/>
+							</div>
+							<div className="grid gap-1">
+								<div className="text-md font-semibold">
+									Markers configuration
+								</div>
+								<p className="text-sm text-muted-foreground">
+									Configure the permissions of the user in the markers
+								</p>
+								<Separator className="" />
+							</div>
+							<div className="grid grid-cols-2 gap-4">
+								<FormField
+									control={form.control}
+									name="team_marker_view"
+									render={({ field }) => (
+										<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+											<div className="space-y-0.5">
+												<FormLabel>Read Marker</FormLabel>
+												<FormDescription>
+													Users with read marker access can view markers
+												</FormDescription>
+											</div>
+											<FormControl>
+												<Switch
+													disabled={isFieldDisabled()}
+													checked={field.value}
+													onCheckedChange={field.onChange}
+												/>
+											</FormControl>
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="team_marker_create"
+									render={({ field }) => (
+										<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+											<div className="space-y-0.5">
+												<FormLabel>Create Marker</FormLabel>
+												<FormDescription>
+													Users with create marker access can create new markers
+												</FormDescription>
+											</div>
+											<FormControl>
+												<Switch
+													disabled={isFieldDisabled()}
+													checked={field.value}
+													onCheckedChange={field.onChange}
+												/>
+											</FormControl>
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="team_marker_edit"
+									render={({ field }) => (
+										<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+											<div className="space-y-0.5">
+												<FormLabel>Modify Marker</FormLabel>
+												<FormDescription>
+													Users with modify marker access can modify markers
+												</FormDescription>
+											</div>
+											<FormControl>
+												<Switch
+													disabled={isFieldDisabled()}
+													checked={field.value}
+													onCheckedChange={field.onChange}
+												/>
+											</FormControl>
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="team_marker_delete"
+									render={({ field }) => (
+										<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+											<div className="space-y-0.5">
+												<FormLabel>Delete marker</FormLabel>
+												<FormDescription>
+													Users with delete marker access can delete markers
+												</FormDescription>
+											</div>
+											<FormControl>
+												<Switch
+													disabled={isFieldDisabled()}
+													checked={field.value}
+													onCheckedChange={field.onChange}
+												/>
+											</FormControl>
+										</FormItem>
+									)}
+								/>
+							</div>
 
-						{/* <FormField
+							{/* <FormField
 							control={form.control}
 							name="inviteeId"
 							render={({ field }) => (
@@ -491,22 +496,23 @@ export function SettingsUserTeam({
 							)}
 						/> */}
 
-						<div className="flex gap-4">
-							<DialogClose asChild>
-								<Button className="w-full" variant={'outline'} type="button">
-									Cancel
+							<div className="flex gap-4">
+								<DialogClose asChild>
+									<Button className="w-full" variant={'outline'} type="button">
+										Cancel
+									</Button>
+								</DialogClose>
+								<Button
+									disabled={role === 'OWNER'}
+									className="w-full"
+									variant={'default'}
+									type="submit">
+									Save
 								</Button>
-							</DialogClose>
-							<Button
-								disabled={role === 'OWNER'}
-								className="w-full"
-								variant={'default'}
-								type="submit">
-								Save
-							</Button>
-						</div>
-					</form>
-				</Form>
+							</div>
+						</form>
+					</Form>
+				</ScrollArea>
 			</DialogContent>
 		</Dialog>
 	)

@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-
-import { cn } from '~/lib/utils'
+import { api } from '~/trpc/react'
 
 import { Button } from '~/components/ui/button'
 import {
@@ -25,9 +24,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '~/components/ui/dialog'
-import { api } from '~/trpc/react'
-
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Check, ChevronsUpDown, UserPlus } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useToast } from '~/components/ui/use-toast'
 import {
@@ -45,6 +42,7 @@ import {
 } from '~/components/ui/command'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { CommandList } from 'cmdk'
+import { cn } from '~/lib/utils'
 
 const formSchema = z.object({
 	inviteeId: z.string({
@@ -52,13 +50,10 @@ const formSchema = z.object({
 	}),
 })
 
-export function SendInvitationForm() {
+export function AddMemberForm() {
 	const { toast } = useToast()
 	const [open, setOpen] = useState(false)
 	const [users, setUsers] = useState<
-		{ id: string; name: string | undefined; image: string | undefined }[]
-	>([])
-	const [membersTwitch, setMembersTwitch] = useState<
 		{ id: string; name: string | undefined; image: string | undefined }[]
 	>([])
 	const queryClient = useQueryClient()
@@ -74,9 +69,6 @@ export function SendInvitationForm() {
 				image: user.image ?? undefined,
 			}))
 			setUsers(updatedData)
-		}
-		if (membersTwitchData) {
-			setMembersTwitch(membersTwitchData)
 		}
 	}, [data, membersTwitchData])
 
@@ -94,13 +86,18 @@ export function SendInvitationForm() {
 	})
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
-		mutate({ inviteeId: values.inviteeId })
-
-		toast({
-			title: 'Team created',
-			description: 'Your team has been created successfully.',
-			variant: 'default',
-		})
+		mutate(
+			{ inviteeId: values.inviteeId },
+			{
+				onSuccess: () => {
+					toast({
+						title: 'Invitation sent',
+						description: 'The invitation has been sent successfully.',
+						variant: 'default',
+					})
+				},
+			},
+		)
 		form.reset()
 		setOpen(false)
 	}
@@ -109,13 +106,13 @@ export function SendInvitationForm() {
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
 				<Button variant={'default'}>
-					<Plus className="mr-2 h-4 w-4" />
-					Invite user
+					<UserPlus className="mr-2 h-4 w-4" />
+					Add Member
 				</Button>
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Send invitation</DialogTitle>
+					<DialogTitle>Add Member</DialogTitle>
 					<DialogDescription>
 						Enter the name of the user you want to invite to your team.
 					</DialogDescription>
@@ -140,9 +137,7 @@ export function SendInvitationForm() {
 														!field.value && 'text-muted-foreground',
 													)}>
 													{field.value
-														? users
-																.concat(membersTwitch)
-																.find((u) => u.id === field.value)?.name
+														? users.find((u) => u.id === field.value)?.name
 														: 'Select user to invite'}
 													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 												</Button>
@@ -153,7 +148,7 @@ export function SendInvitationForm() {
 												<CommandInput placeholder="Search user to invite..." />
 												<CommandList>
 													<CommandEmpty>User not found.</CommandEmpty>
-													<CommandGroup heading="T-Record moderators">
+													<CommandGroup>
 														{users.map((user) => (
 															<CommandItem
 																value={user.name}
@@ -188,47 +183,10 @@ export function SendInvitationForm() {
 														))}
 													</CommandGroup>
 													<CommandSeparator />
-													<CommandGroup heading="Twitch moderators">
-														{membersTwitch.map((user) => (
-															<CommandItem
-																value={user.name}
-																key={user.id}
-																onSelect={async () => {
-																	//TODO: Send invitation to email
-
-																	form.setValue('inviteeId', user.id)
-																}}>
-																<Check
-																	className={cn(
-																		'mr-2 h-4 w-4',
-																		user.id === field.value
-																			? 'opacity-100'
-																			: 'opacity-0',
-																	)}
-																/>
-																<Avatar className="mr-2 h-8 w-8 cursor-pointer">
-																	<AvatarImage
-																		src={undefined}
-																		alt="profile-image"
-																	/>
-																	<AvatarFallback>
-																		{user.name
-																			?.split(' ')
-																			.map((n: string) => n[0])
-																			.join('')}
-																	</AvatarFallback>
-																</Avatar>
-																<span className="font-semibold">
-																	{user.name}
-																</span>
-															</CommandItem>
-														))}
-													</CommandGroup>
 												</CommandList>
 											</Command>
 										</PopoverContent>
 									</Popover>
-
 									<FormMessage />
 								</FormItem>
 							)}

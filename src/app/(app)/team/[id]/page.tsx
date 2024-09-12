@@ -10,8 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import Markerlist from '~/app/_components/markers/markers-list'
 import { DatePickerFilter } from '~/app/_components/markers/date-picker-filter'
 import SelectFilter from '~/app/_components/markers/select-filter'
-import { SendInvitationForm } from '~/app/_components/team/send-invitation-form'
-import { type Members } from '~/adapters/team.adapter'
+import { AddMemberForm } from '~/app/_components/team/add-member-form'
+import { SendEmailInvitationForm } from '~/app/_components/team/send-email-invitation-form'
+import type { Members } from '~/adapters/team.adapter'
 import type { Permission, Role } from '@prisma/client'
 
 export default function MyTeam({ params }: { params: { id: string } }) {
@@ -30,7 +31,7 @@ export default function MyTeam({ params }: { params: { id: string } }) {
 		permissions: Permission[]
 	}>({ role: 'MEMBER', permissions: ['TEAM_MARKER_VIEW'] })
 
-	const { data: allmembersData } = api.team.members.useQuery({
+	const { data: allMembersData } = api.team.members.useQuery({
 		teamId: params.id,
 	})
 	const { data: teamData } = api.team.dataTeam.useQuery({ id: params.id })
@@ -41,23 +42,22 @@ export default function MyTeam({ params }: { params: { id: string } }) {
 	)
 
 	useEffect(() => {
-		if (allmembersData) {
-			setMembers(allmembersData)
+		if (allMembersData) {
+			setMembers(allMembersData)
 		}
-
 		if (userPermissionData) {
 			setUserPermission(userPermissionData)
 		}
 		if (teamData) {
 			setTeam(teamData)
 		}
-	}, [allmembersData, teamData, userPermissionData])
+	}, [allMembersData, teamData, userPermissionData])
 
 	const tabs: { value: string; label: string }[] = [
 		{ value: 'dashboard', label: 'Dashboard' },
-		{ value: 'stream', label: 'Stream' },
+		// { value: 'stream', label: 'Stream' },
 		{ value: 'members', label: 'Members' },
-		{ value: 'notes', label: 'Notes' },
+		// { value: 'notes', label: 'Notes' },
 	]
 
 	return (
@@ -109,15 +109,15 @@ export default function MyTeam({ params }: { params: { id: string } }) {
 									{(userPermission.role === 'OWNER' ||
 										userPermission.permissions.includes(
 											'TEAM_USER_INVITE',
-										)) && <SendInvitationForm />}
+										)) && (
+										<div>
+											<AddMemberForm /> <SendEmailInvitationForm />
+										</div>
+									)}
 								</div>
 							</div>
 							<DataTable columns={columnsMembers} data={members} />
 						</div>
-					</TabsContent>
-					<TabsContent value="notes" className="min-h-screen"></TabsContent>
-					<TabsContent value="stream" className="min-h-screen">
-						<div className="flex flex-col gap-4"></div>
 					</TabsContent>
 				</div>
 			</Tabs>

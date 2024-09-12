@@ -32,6 +32,7 @@ export const env = createEnv({
     TWITCH_CLIENT_SECRET: z.string(),
     LS_API_KEY: z.string(),
     CRON_SECRET: z.string(),
+    RESEND_KEY: z.string(),
   },
 
   /**
@@ -56,6 +57,7 @@ export const env = createEnv({
     TWITCH_CLIENT_SECRET: process.env.TWITCH_CLIENT_SECRET,
     LS_API_KEY: process.env.LS_API_KEY,
     CRON_SECRET: process.env.CRON_SECRET,
+    RESEND_KEY: process.env.RESEND_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
