@@ -107,16 +107,15 @@ export const teamsRouter = createTRPCRouter({
 				if (!membersMap[moderator.id]) {
 					membersMap[moderator.id] = { ...moderator };
 				} else {
-					membersMap[moderator.id].roles = [...new Set([...membersMap[moderator.id].roles, ...moderator.roles])];
+					membersMap[moderator.id]!.roles = [...new Set([...membersMap[moderator.id]!.roles, ...moderator.roles])];
 				}
 			});
 			
-			// Agregar editores al mapa
 			me.forEach((editor) => {
 				if (!membersMap[editor.id]) {
 					membersMap[editor.id] = { ...editor };
 				} else {
-					membersMap[editor.id].roles = [...new Set([...membersMap[editor.id].roles, ...editor.roles])];
+					membersMap[editor.id]!.roles = [...new Set([...membersMap[editor.id]!.roles, ...editor.roles])];
 				}
 			});
 
